@@ -250,7 +250,9 @@ select
     unique_key_candidates,
     best_unique_key,
     -- populated post-build by probe_unique_key_candidates() — null until macro runs
-    null::varchar                                                           as likely_unique_key,
+    -- Explicit width: a bare NULL in Redshift CTAS is sized varchar(1), so the
+    -- post-hook update fails with "value too long for type character varying(1)".
+    cast(null as varchar(256))                                              as likely_unique_key,
     -- strategy rationale
     -- Explicit varchar cast: Redshift infers a fixed CTAS column width from a
     -- single CASE branch, which can be too narrow for other branches' actual
