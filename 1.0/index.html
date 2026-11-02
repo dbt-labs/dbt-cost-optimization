@@ -419,10 +419,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#turn-the-package-on-with-an-environment-variable" class="md-nav__link">
+  <a href="#turn-the-package-on-with-environment-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Turn the package on with an environment variable
+        Turn the package on with environment variables
       
     </span>
   </a>
@@ -1617,9 +1617,6 @@
 
 
 <h1 id="dbt-cost-optimization-package">dbt Cost Optimization Package<a class="headerlink" href="#dbt-cost-optimization-package" title="Permanent link">#</a></h1>
-<blockquote>
-<p><strong>This is the dbt v1 version of the package</strong> (dbt-core 1.10 and later, <code>1.x.x</code> releases). Running dbt v2 (the dbt Fusion engine)? Use the <a href="https://github.com/dbt-labs/dbt-cost-optimization/tree/main"><code>main</code></a> branch and the <code>2.x.x</code> releases instead.</p>
-</blockquote>
 <p>A dbt package that analyzes your data platform's compute, storage, and query patterns to identify optimization opportunities and produce actionable recommendations.</p>
 <h2 id="supported-platforms">Supported platforms<a class="headerlink" href="#supported-platforms" title="Permanent link">#</a></h2>
 <table>
@@ -1795,7 +1792,7 @@
 <p>See each platform's docs for model details and configuration.</p>
 <hr />
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
-<p>Requires dbt v1: dbt-core 1.10 or later.</p>
+<p>Works on dbt v2 (the dbt Fusion engine) and dbt v1 (dbt-core 1.10 and later).</p>
 <p>Add to your <code>packages.yml</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">packages</span><span class="p">:</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dbt-labs/dbt_cost_optimization</span>
@@ -1804,7 +1801,6 @@
 <p>Then run:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dbt<span class="w"> </span>deps
 </span></code></pre></div>
-<p>The <code>&lt;2.0.0</code> bound matters: <code>2.x.x</code> releases are for dbt v2 and don't run on dbt v1.</p>
 <h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">#</a></h2>
 <p>After installation, see your platform's documentation for required permissions, configuration, and quick start commands:</p>
 <ul>
@@ -1815,8 +1811,8 @@
 </ul>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>The package is <strong>opt-in</strong>: its models only build where you turn it on.</p>
-<h3 id="turn-the-package-on-with-an-environment-variable">Turn the package on with an environment variable<a class="headerlink" href="#turn-the-package-on-with-an-environment-variable" title="Permanent link">#</a></h3>
-<p>On dbt v1, a package's <code>dbt_project.yml</code> can't read your project's vars, so the settings that switch models on and off are environment variables. Set them only in the environments or jobs that should build the package (your shell, CI, or a dbt platform environment or job):</p>
+<h3 id="turn-the-package-on-with-environment-variables">Turn the package on with environment variables<a class="headerlink" href="#turn-the-package-on-with-environment-variables" title="Permanent link">#</a></h3>
+<p>The settings that switch the package's models on and off are environment variables. They work the same on dbt v1 and dbt v2, so nothing changes when a project moves from one to the other. Set them only in the environments or jobs that should build the package (your shell, CI, or a dbt platform environment or job):</p>
 <table>
 <thead>
 <tr>
@@ -1851,14 +1847,20 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DBT_COST_OPTIMIZATION_ENABLED</span><span class="o">=</span><span class="nb">true</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization
 </span></code></pre></div>
-<p>After you change one of these variables, run the next command once with <code>--no-partial-parse</code>, so dbt re-reads the package's configuration.</p>
+<p>On dbt v1, after you change one of these environment variables, run the next command once with <code>--no-partial-parse</code>, so dbt re-reads the package's configuration.</p>
+<blockquote>
+<p><strong>Why environment variables?</strong> On dbt v1, dbt-core renders an installed package's <code>dbt_project.yml</code> without your project's vars, so a var can't switch the package's models on there. On dbt v2, the vars (<code>dbt_cost_optimization_enabled</code>, <code>snowflake_enterprise_edition</code>, <code>ai_rest_api_enabled</code>, <code>use_query_text_attribution</code>) also work, set in <code>vars.yml</code> or with <code>--vars</code>, but not in your <code>dbt_project.yml</code> <code>vars:</code> section. Use one or the other for each setting, not both.</p>
+</blockquote>
 <h3 id="every-other-var">Every other var<a class="headerlink" href="#every-other-var" title="Permanent link">#</a></h3>
-<p>Set the package's other vars (lookback windows, thresholds, <code>credit_rate_usd</code>, scope settings) in your project's <code>dbt_project.yml</code> <code>vars:</code> section, or with <code>--vars</code>:</p>
+<p>Set the package's other vars (lookback windows, thresholds, <code>credit_rate_usd</code>, scope settings) in your project's <code>dbt_project.yml</code> <code>vars:</code> section, in a <code>vars.yml</code> file in your project root (dbt v2, and dbt-core 1.12 and later), or with <code>--vars</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># dbt_project.yml</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">vars</span><span class="p">:</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">credit_rate_usd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">dbt_excluded_schemas</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'DBT_CLOUD_PR_%'</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
+<blockquote>
+<p><strong><code>vars.yml</code> needs dbt v2 or dbt-core 1.12 and later.</strong> On dbt-core 1.10 and 1.11, <code>vars.yml</code> isn't read: set vars in your <code>dbt_project.yml</code> <code>vars:</code> section or with <code>--vars</code>.</p>
+</blockquote>
 <p>On dbt v1, var values must be literals: dbt v1 doesn't render Jinja (such as <code>"{{ target.database }}"</code>) in <code>vars:</code> values. Every var has a default. For the full list, see your platform's documentation or the <code>vars:</code> section of <a href="https://github.com/dbt-labs/dbt-cost-optimization/blob/main/dbt_project.yml">dbt_project.yml</a>, which groups them into shared and per-platform sections.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
 <h3 id="package-models-are-disabled-by-default">Package models are disabled by default<a class="headerlink" href="#package-models-are-disabled-by-default" title="Permanent link">#</a></h3>

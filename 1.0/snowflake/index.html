@@ -1888,7 +1888,7 @@
 <p>When these views are unavailable (Standard edition), the package gracefully falls back:
 - Spillage recommendations produce no rows (with an explanatory message)
 - Query-to-table attribution falls back to <code>query_text ILIKE</code> matching</p>
-<p>If you're on Standard edition, set the environment variable <code>DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false</code> wherever the package runs. On dbt v1 this setting switches models on and off, so it's an environment variable rather than a var (see <a href="#configuration">Configuration</a>).</p>
+<p>If you're on Standard edition, set the environment variable <code>DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false</code> wherever the package runs. See <a href="#configuration">Configuration</a>.</p>
 <h3 id="account_usage-latency">ACCOUNT_USAGE Latency<a class="headerlink" href="#account_usage-latency" title="Permanent link">#</a></h3>
 <p>Snowflake's ACCOUNT_USAGE views have data latency:</p>
 <table>
@@ -1946,7 +1946,7 @@
 <hr />
 <h2 id="package-models-are-disabled-by-default">Package Models Are Disabled by Default<a class="headerlink" href="#package-models-are-disabled-by-default" title="Permanent link">#</a></h2>
 <p>Persistent package models are <strong>disabled by default</strong> so they do not run on your project's normal <code>dbt run</code> or <code>dbt build</code>. Macros are always available regardless.</p>
-<p>To build package models, explicitly opt in by setting the environment variable <code>DBT_COST_OPTIMIZATION_ENABLED=true</code>. On dbt v1, a package's <code>dbt_project.yml</code> can't read your project's vars, so the package is switched on with an environment variable.</p>
+<p>To build package models, explicitly opt in with the environment variable <code>DBT_COST_OPTIMIZATION_ENABLED=true</code>. It works the same on dbt v1 and dbt v2 (see <a href="#configuration">Configuration</a> for why it's an environment variable).</p>
 <p><strong>Recommended: dedicated scheduled jobs</strong> (no changes to existing jobs required). Set <code>DBT_COST_OPTIMIZATION_ENABLED=true</code> on those jobs only, for example as a job-level environment variable in the dbt platform:
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># All package models</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization
@@ -1956,7 +1956,7 @@
 </span></code></pre></div></p>
 <p><strong>Alternative: enable it for a whole environment</strong> (builds on every dbt run)</p>
 <p>Set <code>DBT_COST_OPTIMIZATION_ENABLED=true</code> for the environment. Every run there then builds the package, so exclude package models from the runs where you don't want them (for example <code>--exclude package:dbt_cost_optimization</code>).</p>
-<p>After you change one of the package's environment variables, run the next command once with <code>--no-partial-parse</code>, so dbt re-reads the package's configuration.</p>
+<p>On dbt v1, after you change one of the package's environment variables, run the next command once with <code>--no-partial-parse</code>, so dbt re-reads the package's configuration.</p>
 <h3 id="suggested-cadences">Suggested cadences<a class="headerlink" href="#suggested-cadences" title="Permanent link">#</a></h3>
 <table>
 <thead>
@@ -2056,7 +2056,7 @@
 </span></code></pre></div>
 <hr />
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
-<p><strong>Settings that switch models on and off are environment variables.</strong> On dbt v1, a package's <code>dbt_project.yml</code> can't read your project's vars, so these four are set as environment variables, only where the package should build:</p>
+<p><strong>Settings that switch models on and off are environment variables.</strong> They work the same on dbt v1 and dbt v2. Set them only where the package should build:</p>
 <table>
 <thead>
 <tr>
@@ -2083,13 +2083,15 @@
 </tr>
 </tbody>
 </table>
-<p>After you change one, run the next command once with <code>--no-partial-parse</code>.</p>
-<p><strong>Every other variable</strong> can be overridden in either of these ways:</p>
+<p>On dbt v1, after you change one, run the next command once with <code>--no-partial-parse</code>.</p>
+<p>Why environment variables: on dbt v1, dbt-core renders an installed package's <code>dbt_project.yml</code> without your project's vars, so a var can't switch the package's models on. On dbt v2, the matching vars (<code>dbt_cost_optimization_enabled</code>, <code>snowflake_enterprise_edition</code>, <code>ai_rest_api_enabled</code>) also work in <code>vars.yml</code> or with <code>--vars</code>, but not in your <code>dbt_project.yml</code> <code>vars:</code> section. Use one or the other for each setting, not both.</p>
+<p><strong>Every other variable</strong> can be overridden in any of these ways:</p>
 <ul>
 <li>In your project's <code>dbt_project.yml</code> <code>vars:</code> section</li>
+<li>In a <code>vars.yml</code> file in your project root (dbt v2 and dbt-core 1.12 and later; on dbt-core 1.10 and 1.11, <code>vars.yml</code> isn't read, so use the <code>vars:</code> section or <code>--vars</code>)</li>
 <li>Via CLI: <code>--vars '{var_name: value}'</code></li>
 </ul>
-<p>Var values must be literals: dbt v1 doesn't render Jinja (such as <code>"{{ target.database }}"</code>) in <code>vars:</code> values.</p>
+<p>On dbt v1, var values must be literals: dbt v1 doesn't render Jinja (such as <code>"{{ target.database }}"</code>) in <code>vars:</code> values.</p>
 <h3 id="edition-and-shared-settings">Edition and shared settings<a class="headerlink" href="#edition-and-shared-settings" title="Permanent link">#</a></h3>
 <table>
 <thead>

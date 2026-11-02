@@ -1526,7 +1526,7 @@
 
 <h1 id="testing-guide">Testing guide<a class="headerlink" href="#testing-guide" title="Permanent link">#</a></h1>
 <p>How this package is tested, how to run the tests, and what the results should look like.</p>
-<p><strong>Scope today:</strong> Snowflake, on dbt v1 (this branch, <code>main-v1</code>; dbt-core 1.10 and later). The same suites run on dbt v2 from the <code>main</code> branch. The Databricks, BigQuery, and Redshift models are in beta and have their own data tests. Their unit tests are planned.</p>
+<p><strong>Scope today:</strong> Snowflake, on dbt v2 (the dbt Fusion engine) and dbt v1 (dbt-core 1.10 and later). The same commands and expected results apply to both engines. The Databricks, BigQuery, and Redshift models are in beta and have their own data tests. Their unit tests are planned.</p>
 <hr />
 <h2 id="1-what-each-kind-of-test-proves">1. What each kind of test proves<a class="headerlink" href="#1-what-each-kind-of-test-proves" title="Permanent link">#</a></h2>
 <table>
@@ -1591,7 +1591,7 @@
 <hr />
 <h2 id="2-before-you-start">2. Before you start<a class="headerlink" href="#2-before-you-start" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>dbt v1: dbt-core 1.10 or later, with dbt-snowflake.</strong> The suites below were run on dbt-core 1.11.7 and 1.10.23. To run them without changing your installed dbt, use <code>uvx</code>, for example <code>uvx --from 'dbt-core~=1.11.0' --with 'dbt-snowflake~=1.11.0' dbt &lt;command&gt;</code>.</li>
+<li><strong>dbt v2 (the dbt Fusion engine), or dbt v1: dbt-core 1.10 or later with dbt-snowflake.</strong> The suites below run on both. On dbt v1 they were run on dbt-core 1.11.7 and 1.10.23. To run dbt v1 without changing your installed dbt, use <code>uvx</code>, for example <code>uvx --from 'dbt-core~=1.11.0' --with 'dbt-snowflake~=1.11.0' dbt &lt;command&gt;</code>.</li>
 <li><strong>A Snowflake role that can read <code>SNOWFLAKE.ACCOUNT_USAGE</code></strong> (<code>IMPORTED PRIVILEGES</code> on the <code>SNOWFLAKE</code> database), plus a warehouse.</li>
 <li><strong>A dedicated test schema.</strong> Setting up unit tests builds tables (mostly empty) in it. Because the package sets <code>+schema: dbt_cost_optimization</code>, models land in <code>&lt;your target schema&gt;_dbt_cost_optimization</code>.</li>
 <li><strong>A dbt profile target</strong> for this repo's profile, <code>dbt_cost_optimization</code>, in <code>~/.dbt/profiles.yml</code>. Key-pair authentication works well for repeated test runs:</li>
@@ -1617,7 +1617,7 @@
 <p>The package's models are disabled by default, so every command below turns them on:</p>
 <ul>
 <li><strong>From this repo (unit and macro tests),</strong> the package is the root project, so <code>--vars '{dbt_cost_optimization_enabled: true}'</code> turns it on.</li>
-<li><strong>Where the package is installed</strong> (the data tests, the integration tests and the smoke test), the package's <code>dbt_project.yml</code> can't read vars on dbt v1, so it's turned on with the environment variable <code>DBT_COST_OPTIMIZATION_ENABLED=true</code>. Standard edition also needs <code>DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false</code>.</li>
+<li><strong>Where the package is installed</strong> (the data tests, the integration tests and the smoke test), it's turned on with the environment variable <code>DBT_COST_OPTIMIZATION_ENABLED=true</code>, which works on both engines (on dbt v1, the package's <code>dbt_project.yml</code> can't read vars). Standard edition also needs <code>DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false</code>.</li>
 </ul>
 <p>Add <code>--target &lt;your target&gt;</code> if your test target isn't the profile's default.</p>
 <hr />
