@@ -1901,7 +1901,7 @@
 <p><strong>Workload classification:</strong> Only consumption queries (SELECTs without dbt metadata) contribute to clustering key evidence. dbt model builds, tests, and package-internal queries are excluded via <code>int_snowflake__query_workload_class</code> to prevent false positives from build-time full-table scans.</p>
 <hr />
 <h2 id="project-variables">Project Variables<a class="headerlink" href="#project-variables" title="Permanent link">#</a></h2>
-<p>Set these in a <code>vars.yml</code> file in your project root (or with <code>--vars</code>) to customize behavior.</p>
+<p>Set these in your project's <code>dbt_project.yml</code> <code>vars:</code> section (or with <code>--vars</code>) to customize behavior. On Standard edition, also set the environment variable <code>DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false</code> (see the <a href="https://github.com/dbt-labs/dbt-cost-optimization/blob/main/index.md#configuration">setup guide</a>).</p>
 <h3 id="attribution-and-edition">Attribution and edition<a class="headerlink" href="#attribution-and-edition" title="Permanent link">#</a></h3>
 <table>
 <thead>
@@ -1984,16 +1984,13 @@
 </tbody>
 </table>
 <h3 id="example-configuration">Example configuration<a class="headerlink" href="#example-configuration" title="Permanent link">#</a></h3>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># vars.yml</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># dbt_project.yml</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">vars</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1"># Standard edition Snowflake</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">snowflake_enterprise_edition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1"># Include smaller tables for testing</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">clustering_candidates_min_size_gb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="c1"># Include smaller tables for testing</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">clustering_candidates_min_size_gb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="c1"># Widen the analysis window</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nt">clustering_candidates_lookback_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">14</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="c1"># Widen the analysis window</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">clustering_candidates_lookback_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">14</span>
 </span></code></pre></div>
 <hr />
 <h2 id="output-columns">Output Columns<a class="headerlink" href="#output-columns" title="Permanent link">#</a></h2>

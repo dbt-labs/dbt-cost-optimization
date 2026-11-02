@@ -1753,7 +1753,7 @@
 <li>Macros respect <code>snowflake_enterprise_edition</code> var — Standard edition uses query_text matching instead of ACCESS_HISTORY where applicable.</li>
 <li><strong>Project scoping</strong>: By default, macros only surface models from the installing project (<code>include_package_models=false</code>). Set <code>include_package_models: true</code> to also evaluate models from installed dbt packages.</li>
 <li><code>suppress_staging_materialization_recs</code> var is respected by <code>find_table_materialization_candidates</code>.</li>
-<li>For full analysis with strategy recommendations, confidence scores, and template code, run the model pipeline instead (<code>dbt build --vars '{dbt_cost_optimization_enabled: true}' --select package:dbt_cost_optimization</code>).</li>
+<li>For full analysis with strategy recommendations, confidence scores, and template code, run the model pipeline instead (<code>DBT_COST_OPTIMIZATION_ENABLED=true dbt build --select package:dbt_cost_optimization</code>).</li>
 </ul>
 
 

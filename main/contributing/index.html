@@ -1478,7 +1478,7 @@
 <li><strong><code>macros/optimizations/</code></strong> holds the commands you run with <code>dbt run-operation</code>, such as <code>find_table_clustering_candidates</code>.</li>
 <li><strong><code>macros/platforms/&lt;platform&gt;/</code></strong> holds each platform's implementation of those macros. The package uses <code>adapter.dispatch</code>, so a command with the same name runs the right implementation for your data platform, or tells you it isn't available on your platform yet.</li>
 <li><strong><code>macros/_macros.yml</code></strong> documents every macro's arguments and which platforms it's implemented for.</li>
-<li><strong><code>dbt_project.yml</code></strong> lists every package var and its default, grouped into shared and per-platform sections. To change one, set it in a <code>vars.yml</code> file in your project root or with <code>--vars</code>.</li>
+<li><strong><code>dbt_project.yml</code></strong> lists every package var and its default, grouped into shared and per-platform sections. To change one, set it in your project's <code>dbt_project.yml</code> <code>vars:</code> section or with <code>--vars</code>. The settings that switch models on and off are environment variables on dbt v1 (<code>DBT_COST_OPTIMIZATION_*</code>; see the README).</li>
 </ul>
 
 

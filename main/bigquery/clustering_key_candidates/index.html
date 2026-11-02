@@ -1598,15 +1598,14 @@ tiebreaker, capped at four columns per table.</p>
 <tr>
 <td><code>use_query_text_attribution</code></td>
 <td><code>true</code></td>
-<td>When <code>false</code>, disables the heuristic column-access pipeline. <code>usage_count</code> becomes 0 and ranking falls back to cardinality only.</td>
+<td>When <code>false</code>, disables the heuristic column-access pipeline. <code>usage_count</code> becomes 0 and ranking falls back to cardinality only. On dbt v1, set it as the environment variable <code>DBT_COST_OPTIMIZATION_USE_QUERY_TEXT_ATTRIBUTION=false</code>: it switches models on and off, and a package's <code>dbt_project.yml</code> can't read your project's vars on dbt v1.</td>
 </tr>
 </tbody>
 </table>
-<p>Override in a <code>vars.yml</code> file in your project root (or with <code>--vars</code>):</p>
+<p>Override in your project's <code>dbt_project.yml</code> <code>vars:</code> section (or with <code>--vars</code>):</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">vars</span><span class="p">:</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">clustering_candidates_lookback_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">14</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">clustering_key_cardinality_table_limit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">25</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">use_query_text_attribution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span></code></pre></div>
 <h2 id="bigquery-specific-caveats">BigQuery-specific caveats<a class="headerlink" href="#bigquery-specific-caveats" title="Permanent link">#</a></h2>
 <ol>

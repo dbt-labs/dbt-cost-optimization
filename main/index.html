@@ -415,6 +415,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#turn-the-package-on-with-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Turn the package on with environment variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#every-other-var" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Every other var
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1589,9 +1617,6 @@
 
 
 <h1 id="dbt-cost-optimization-package">dbt Cost Optimization Package<a class="headerlink" href="#dbt-cost-optimization-package" title="Permanent link">#</a></h1>
-<blockquote>
-<p><strong>This is the dbt v2 version of the package</strong> (the dbt Fusion engine, <code>2.x.x</code> releases). Running dbt v1 (dbt-core)? Use the <a href="https://github.com/dbt-labs/dbt-cost-optimization/tree/main-v1"><code>main-v1</code></a> branch and the <code>1.x.x</code> releases instead.</p>
-</blockquote>
 <p>A dbt package that analyzes your data platform's compute, storage, and query patterns to identify optimization opportunities and produce actionable recommendations.</p>
 <h2 id="supported-platforms">Supported platforms<a class="headerlink" href="#supported-platforms" title="Permanent link">#</a></h2>
 <table>
@@ -1767,11 +1792,11 @@
 <p>See each platform's docs for model details and configuration.</p>
 <hr />
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
-<p>Requires dbt v2 (the dbt Fusion engine). For dbt v1 (dbt-core 1.10 and later), use the <code>1.x.x</code> releases from the <a href="https://github.com/dbt-labs/dbt-cost-optimization/tree/main-v1"><code>main-v1</code></a> branch.</p>
+<p>Works on dbt v2 (the dbt Fusion engine) and dbt v1 (dbt-core 1.10 and later).</p>
 <p>Add to your <code>packages.yml</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">packages</span><span class="p">:</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dbt-labs/dbt_cost_optimization</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"&gt;=2.0.0"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&lt;3.0.0"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"&gt;=1.0.0"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&lt;2.0.0"</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
 <p>Then run:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dbt<span class="w"> </span>deps
@@ -1785,14 +1810,58 @@
 <li><strong>Redshift:</strong> <a href="redshift/">docs/redshift/</a></li>
 </ul>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
-<p>The package is <strong>opt-in</strong>. Package models only build when <code>dbt_cost_optimization_enabled</code> is <code>true</code>.</p>
-<p>To customize the package's behavior, create a <code>vars.yml</code> file in your project root:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># vars.yml</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">vars</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">dbt_cost_optimization_enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<p>The package is <strong>opt-in</strong>: its models only build where you turn it on.</p>
+<h3 id="turn-the-package-on-with-environment-variables">Turn the package on with environment variables<a class="headerlink" href="#turn-the-package-on-with-environment-variables" title="Permanent link">#</a></h3>
+<p>The settings that switch the package's models on and off are environment variables. They work the same on dbt v1 and dbt v2, so nothing changes when a project moves from one to the other. Set them only in the environments or jobs that should build the package (your shell, CI, or a dbt platform environment or job):</p>
+<table>
+<thead>
+<tr>
+<th>Environment variable</th>
+<th>Default</th>
+<th>Set it when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DBT_COST_OPTIMIZATION_ENABLED</code></td>
+<td><code>false</code></td>
+<td>Always, to build the package: <code>true</code></td>
+</tr>
+<tr>
+<td><code>DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION</code></td>
+<td><code>true</code></td>
+<td>You're on Snowflake Standard edition: <code>false</code></td>
+</tr>
+<tr>
+<td><code>DBT_COST_OPTIMIZATION_AI_REST_API_ENABLED</code></td>
+<td><code>true</code></td>
+<td>You want to leave Cortex REST API usage (billed in dollars, not credits) out of the AI analysis: <code>false</code></td>
+</tr>
+<tr>
+<td><code>DBT_COST_OPTIMIZATION_USE_QUERY_TEXT_ATTRIBUTION</code></td>
+<td><code>true</code></td>
+<td>BigQuery only, to turn off query-text column attribution: <code>false</code></td>
+</tr>
+</tbody>
+</table>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DBT_COST_OPTIMIZATION_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization
 </span></code></pre></div>
-<p>Or pass vars on the command line with <code>--vars '{var_name: value}'</code>. Overriding package vars in your own <code>dbt_project.yml</code> <code>vars:</code> section is not supported.</p>
-<p>Every other var has a default. For the full list, see your platform's documentation or the <code>vars:</code> section of <a href="https://github.com/dbt-labs/dbt-cost-optimization/blob/main/dbt_project.yml">dbt_project.yml</a>, which groups them into shared and per-platform sections.</p>
+<p>On dbt v1, after you change one of these environment variables, run the next command once with <code>--no-partial-parse</code>, so dbt re-reads the package's configuration.</p>
+<blockquote>
+<p><strong>Why environment variables?</strong> On dbt v1, dbt-core renders an installed package's <code>dbt_project.yml</code> without your project's vars, so a var can't switch the package's models on there. On dbt v2, the vars (<code>dbt_cost_optimization_enabled</code>, <code>snowflake_enterprise_edition</code>, <code>ai_rest_api_enabled</code>, <code>use_query_text_attribution</code>) also work, set in <code>vars.yml</code> or with <code>--vars</code>, but not in your <code>dbt_project.yml</code> <code>vars:</code> section. Use one or the other for each setting, not both.</p>
+</blockquote>
+<h3 id="every-other-var">Every other var<a class="headerlink" href="#every-other-var" title="Permanent link">#</a></h3>
+<p>Set the package's other vars (lookback windows, thresholds, <code>credit_rate_usd</code>, scope settings) in your project's <code>dbt_project.yml</code> <code>vars:</code> section, in a <code>vars.yml</code> file in your project root (dbt v2, and dbt-core 1.12 and later), or with <code>--vars</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># dbt_project.yml</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">vars</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">credit_rate_usd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">dbt_excluded_schemas</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'DBT_CLOUD_PR_%'</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<blockquote>
+<p><strong><code>vars.yml</code> needs dbt v2 or dbt-core 1.12 and later.</strong> On dbt-core 1.10 and 1.11, <code>vars.yml</code> isn't read: set vars in your <code>dbt_project.yml</code> <code>vars:</code> section or with <code>--vars</code>.</p>
+</blockquote>
+<p>On dbt v1, var values must be literals: dbt v1 doesn't render Jinja (such as <code>"{{ target.database }}"</code>) in <code>vars:</code> values. Every var has a default. For the full list, see your platform's documentation or the <code>vars:</code> section of <a href="https://github.com/dbt-labs/dbt-cost-optimization/blob/main/dbt_project.yml">dbt_project.yml</a>, which groups them into shared and per-platform sections.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
 <h3 id="package-models-are-disabled-by-default">Package models are disabled by default<a class="headerlink" href="#package-models-are-disabled-by-default" title="Permanent link">#</a></h3>
 <p>After installation:</p>
@@ -1801,15 +1870,15 @@
 <li><strong>Package models do not run</strong> during your project's normal <code>dbt run</code> / <code>dbt build</code></li>
 </ul>
 <p>To build package models, explicitly opt in.</p>
-<p><strong>Recommended: dedicated scheduled jobs</strong> (no changes to existing jobs required)
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># All package models</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dbt<span class="w"> </span>build<span class="w"> </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true}'</span><span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Or select by optimization domain</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>dbt<span class="w"> </span>build<span class="w"> </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true}'</span><span class="w"> </span>--select<span class="w"> </span>+tag:clustering
+<p><strong>Recommended: dedicated scheduled jobs</strong> (no changes to existing jobs required). Set <code>DBT_COST_OPTIMIZATION_ENABLED=true</code> on those jobs only, for example as a job-level environment variable in the dbt platform:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># All package models</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Or select by optimization domain</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>+tag:clustering
 </span></code></pre></div></p>
-<p><strong>Alternative: enable in your <code>vars.yml</code></strong> (models build on every run)</p>
-<p>If you set <code>dbt_cost_optimization_enabled: true</code> in your <code>vars.yml</code>, you will need to explicitly exclude package models from general runs where they are not desired.</p>
+<p><strong>Alternative: enable it for a whole environment</strong> (models build on every run)</p>
+<p>If you set <code>DBT_COST_OPTIMIZATION_ENABLED=true</code> for an environment, every run there builds the package, so exclude package models from the runs where you don't want them (for example <code>--exclude package:dbt_cost_optimization</code>).</p>
 <p>Either way, this avoids unexpectedly querying large platform system tables (such as Snowflake's <code>ACCOUNT_USAGE</code> views) on every regular dbt build. Only the models for your data platform are enabled.</p>
 <h3 id="suggested-cadences-for-scheduled-jobs">Suggested cadences for scheduled jobs<a class="headerlink" href="#suggested-cadences-for-scheduled-jobs" title="Permanent link">#</a></h3>
 <table>
@@ -1888,7 +1957,7 @@
 </tbody>
 </table>
 <p>Graph-dependent recommendations require the dbt project graph. Warehouse and expensive query signals use Snowflake query_history, which provides account-wide visibility scoped to warehouses the project uses.</p>
-<p>To leave dev deployments out of the Snowflake recommendations, set <code>dbt_excluded_schemas</code> (schema patterns, e.g. <code>['DBT_%']</code>) or <code>dbt_excluded_targets</code> (e.g. <code>['dev']</code>) in your <code>vars.yml</code>. By default nothing is excluded.</p>
+<p>To leave dev deployments out of the Snowflake recommendations, set <code>dbt_excluded_schemas</code> (schema patterns, e.g. <code>['DBT_%']</code>) or <code>dbt_excluded_targets</code> (e.g. <code>['dev']</code>) in your <code>dbt_project.yml</code> <code>vars:</code> section. By default nothing is excluded.</p>
 <p>On Databricks, BigQuery, and Redshift, recommendations are scoped to your project's dbt models by default. See each platform's docs for the scope settings.</p>
 <h2 id="visualize-your-results">Visualize your results<a class="headerlink" href="#visualize-your-results" title="Permanent link">#</a></h2>
 <p>For Snowflake, once you've built the gold-layer models, see
@@ -1896,36 +1965,36 @@
 launch a <a href="https://github.com/dbt-labs/dbt-charts">dbt-charts</a> dashboard
 over them.</p>
 <h2 id="repository-structure">Repository structure<a class="headerlink" href="#repository-structure" title="Permanent link">#</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>models/
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  shared/              Platform-agnostic models (dbt graph introspection)
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  snowflake/
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    staging/           Source staging models
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    intermediate/      Transforms, aggregations, and cross-environment discovery
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    marts/
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>      clustering/      Table clustering candidate recommendations
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>      materialization/ View-to-table and incremental strategy recommendations
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>      warehouse/       Sizing, spillage, and expensive query recommendations
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>      ai/              AI/Cortex spend and token efficiency recommendations
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>      gold/            Dashboard-ready views (cross-domain, deduplicated by model)
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>  databricks/          staging/, intermediate/, marts/
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>  bigquery/            staging/, intermediate/, marts/
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>  redshift/            staging/, intermediate/, marts/
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>macros/
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>  _macros.yml          Every macro's arguments and which platforms implement it
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>  optimizations/       Commands you run with dbt run-operation (and their helpers)
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>  utils/               Internal utilities used by models and hooks
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>  platforms/           Each platform's implementation of the macros above
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>docs/
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>  snowflake/           Setup guide, permissions, configuration, and reference docs
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>  databricks/          Model docs
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>  bigquery/            Model docs
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>  redshift/            Model docs and platform notes
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>tests/snowflake/       Macro tests (unit tests sit next to their models)
-</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>integration_tests/
-</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>  snowflake/           A dbt project that runs the package on fixture ACCOUNT_USAGE data
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>models/
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  shared/              Platform-agnostic models (dbt graph introspection)
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  snowflake/
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    staging/           Source staging models
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    intermediate/      Transforms, aggregations, and cross-environment discovery
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    marts/
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>      clustering/      Table clustering candidate recommendations
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>      materialization/ View-to-table and incremental strategy recommendations
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>      warehouse/       Sizing, spillage, and expensive query recommendations
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>      ai/              AI/Cortex spend and token efficiency recommendations
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>      gold/            Dashboard-ready views (cross-domain, deduplicated by model)
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>  databricks/          staging/, intermediate/, marts/
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>  bigquery/            staging/, intermediate/, marts/
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>  redshift/            staging/, intermediate/, marts/
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>macros/
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>  _macros.yml          Every macro's arguments and which platforms implement it
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>  optimizations/       Commands you run with dbt run-operation (and their helpers)
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>  utils/               Internal utilities used by models and hooks
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>  platforms/           Each platform's implementation of the macros above
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>docs/
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>  snowflake/           Setup guide, permissions, configuration, and reference docs
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>  databricks/          Model docs
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>  bigquery/            Model docs
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>  redshift/            Model docs and platform notes
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>tests/snowflake/       Macro tests (unit tests sit next to their models)
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>integration_tests/
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>  snowflake/           A dbt project that runs the package on fixture ACCOUNT_USAGE data
 </span></code></pre></div>
 <p><a href="testing/">TESTING.md</a> explains each kind of test and how to run it. The docs in <code>docs/</code> also build into a site with MkDocs Material (<code>mkdocs.yml</code>): run <code>pip install -r docs/requirements.txt</code> and then <code>mkdocs serve</code>.</p>
 <p>Macros use <code>adapter.dispatch</code>, so each command keeps the same name across platforms and runs the right implementation for your data platform.</p>

@@ -1357,16 +1357,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#200-unreleased" class="md-nav__link">
+  <a href="#100-unreleased" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2.0.0 - Unreleased
+        1.0.0 - Unreleased
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="2.0.0 - Unreleased">
+    <nav class="md-nav" aria-label="1.0.0 - Unreleased">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dbt-v1-and-dbt-v2-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dbt v1 and dbt v2 support
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
@@ -1420,19 +1431,24 @@
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">#</a></h1>
 <p>All notable changes to this package are documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this package follows <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<p>This is the changelog for the <strong>dbt v2</strong> release line (<code>2.x.x</code>, from the <code>main</code> branch). The dbt v1 line (<code>1.x.x</code>) is on the <code>main-v1</code> branch. A MINOR version number means the same features on both lines: <code>2.N</code> and <code>1.N</code> match.</p>
-<h2 id="unreleased"><a href="https://github.com/dbt-labs/dbt-cost-optimization/compare/2.0.0...main">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
-<h2 id="200-unreleased"><a href="https://github.com/dbt-labs/dbt-cost-optimization/releases/tag/2.0.0">2.0.0</a> - Unreleased<a class="headerlink" href="#200-unreleased" title="Permanent link">#</a></h2>
-<p>First public release for dbt v2: one package with a shared design across Snowflake, Databricks, BigQuery, and Redshift. <code>1.0.0</code>, from the <code>main-v1</code> branch, has the same features for dbt v1.</p>
+<h2 id="unreleased"><a href="https://github.com/dbt-labs/dbt-cost-optimization/compare/1.0.0...main">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
+<h2 id="100-unreleased"><a href="https://github.com/dbt-labs/dbt-cost-optimization/releases/tag/1.0.0">1.0.0</a> - Unreleased<a class="headerlink" href="#100-unreleased" title="Permanent link">#</a></h2>
+<p>First public release: one package with a shared design across Snowflake, Databricks, BigQuery, and Redshift, for dbt v2 (the dbt Fusion engine) and dbt v1 (dbt-core 1.10 and later).</p>
+<h3 id="dbt-v1-and-dbt-v2-support">dbt v1 and dbt v2 support<a class="headerlink" href="#dbt-v1-and-dbt-v2-support" title="Permanent link">#</a></h3>
+<ul>
+<li><code>require-dbt-version: ["&gt;=1.10.0", "&lt;3.0.0"]</code>.</li>
+<li>The settings that switch models on and off are environment variables that work the same on dbt v1 and dbt v2: <code>DBT_COST_OPTIMIZATION_ENABLED</code>, <code>DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION</code>, <code>DBT_COST_OPTIMIZATION_AI_REST_API_ENABLED</code>, and <code>DBT_COST_OPTIMIZATION_USE_QUERY_TEXT_ATTRIBUTION</code>. On dbt v1, dbt-core renders an installed package's <code>dbt_project.yml</code> without your project's vars, so a var can't switch models on there. On dbt v2, the matching vars also work in <code>vars.yml</code> or with <code>--vars</code>. Models and macros read the same settings through <code>cost_optimization_setting()</code>, so the two always agree.</li>
+<li>Every other var works on both: your <code>dbt_project.yml</code> <code>vars:</code> section, <code>--vars</code>, or <code>vars.yml</code> (dbt v2 and dbt-core 1.12 and later; dbt-core 1.10 and 1.11 don't read <code>vars.yml</code>, so use the <code>vars:</code> section or <code>--vars</code>). On dbt v1, var values must be literals.</li>
+<li><code>-- depends_on</code> hints on <code>fct_snowflake__table_clustering_candidates</code> for the models its post-hooks read, and the Snowflake post-hook macros refer to their own model as <code>this</code>: dbt v1 doesn't see <code>ref()</code> calls inside post-hook macros.</li>
+</ul>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">#</a></h3>
 <h4 id="package-design-all-platforms">Package design (all platforms)<a class="headerlink" href="#package-design-all-platforms" title="Permanent link">#</a></h4>
 <ul>
-<li>Requires dbt v2 (<code>require-dbt-version: ["&gt;=2.0.0", "&lt;3.0.0"]</code>). For dbt v1, use the <code>1.x.x</code> releases from the <code>main-v1</code> branch.</li>
 <li>Platform-first layout: each platform's models live in <code>models/&lt;platform&gt;/</code> (staging, intermediate, marts), and cross-platform models live in <code>models/shared/</code>.</li>
-<li>Opt-in by default: package models only build when <code>dbt_cost_optimization_enabled: true</code>, and only the models for your data platform are enabled.</li>
+<li>Opt-in by default: package models only build when <code>dbt_cost_optimization_enabled</code> is true (or <code>DBT_COST_OPTIMIZATION_ENABLED=true</code>), and only the models for your data platform are enabled.</li>
 <li>Macros behind <code>adapter.dispatch</code>: each command and utility keeps one public name and runs the right implementation for your data platform, or raises a clear "not yet implemented" error where one doesn't exist yet. Implementations live in <code>macros/platforms/&lt;platform&gt;/</code>, and <code>macros/_macros.yml</code> documents every macro's arguments and which platforms implement it.</li>
 <li>Domain tags on marts for scheduled jobs (<code>+tag:clustering</code>, <code>+tag:materialization</code>, <code>+tag:warehouse</code>, <code>+tag:ai_spend</code>, <code>+tag:gold</code>), plus <code>dbt_cost_optimization</code> on every mart. On Snowflake, the intermediate models that feed only the gold views are tagged <code>gold</code> too, so <code>tag:gold</code> (no <code>+</code>) refreshes the dashboards from the last domain builds.</li>
-<li>Package vars grouped into package-wide, shared, and per-platform sections in <code>dbt_project.yml</code>. Override them in a <code>vars.yml</code> file in your project root or with <code>--vars</code>.</li>
+<li>Package vars grouped into package-wide, shared, and per-platform sections in <code>dbt_project.yml</code>. Override them in your <code>dbt_project.yml</code> <code>vars:</code> section, a <code>vars.yml</code> file in your project root (dbt v2 and dbt-core 1.12 and later), or with <code>--vars</code>.</li>
 <li>Shared dbt graph models: <code>int_dbt__relations</code> (models) and <code>int_dbt__snapshots</code> (snapshots).</li>
 </ul>
 <h4 id="snowflake-ga">Snowflake (GA)<a class="headerlink" href="#snowflake-ga" title="Permanent link">#</a></h4>
