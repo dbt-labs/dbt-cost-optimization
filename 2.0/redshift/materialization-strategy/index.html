@@ -1,0 +1,1798 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Find cost optimization opportunities in your dbt project on Snowflake, Databricks, BigQuery and Redshift.">
+      
+      
+      
+        <link rel="canonical" href="https://dbt-labs.github.io/dbt-cost-optimization/2.0/redshift/materialization-strategy/">
+      
+      
+        <link rel="prev" href="../incremental_config_recommendations/">
+      
+      
+        <link rel="next" href="../../testing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Materialization strategy - dbt Cost Optimization Package</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#redshift-materialization-strategy" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="dbt Cost Optimization Package" class="md-header__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dbt Cost Optimization Package
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Materialization strategy
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="dbt Cost Optimization Package" class="md-nav__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    dbt Cost Optimization Package
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Snowflake
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick-use commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recommendations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recommendations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/gold_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/warehouse_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table materialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/table_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/ai_cortex_spend_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/optimization_priorities_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization priorities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/warehouse_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/incremental_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/future_optimizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../databricks/incremental_model_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../databricks/liquid_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../databricks/optimize_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPTIMIZE candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../databricks/model_run_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model run summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigQuery (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bigquery/clustering_key_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clustering key candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redshift (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Redshift (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#source-by-source-classification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source-by-source classification
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#materialization-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Materialization policy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Materialization policy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#staging-layer-modelsstagingredshift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staging layer (models/staging/redshift/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intermediate-layer-modelsintermediateredshift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intermediate layer (models/intermediate/redshift/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#marts-layer-modelsmartsredshift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Marts layer (models/marts/redshift/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-redshift-platform-quirks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Redshift platform quirks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-flowchart-for-new-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision flowchart for new models
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-not-yet-resolved" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions / not yet resolved
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/dbt-labs/dbt-cost-optimization/edit/main/docs/redshift/materialization-strategy.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="redshift-materialization-strategy">Redshift materialization strategy<a class="headerlink" href="#redshift-materialization-strategy" title="Permanent link">#</a></h1>
+<p>This document defines how each model layer in the Redshift implementation of the cost-optimization package is materialized, and why.
+It exists because the package has two distinct classes of correctness constraints that pull in opposite directions.</p>
+<ol>
+<li><strong>Data-loss risk from retention windows.</strong>
+Several Redshift system views are time-bounded — Amazon ages out their rows on a fixed schedule.
+If they're wrapped as plain views in staging, every dbt run only sees Redshift's current retention window, and anything older that has aged out is permanently lost.</li>
+<li><strong>Redshift planner failures on complex view chains.</strong>
+Deep chains of views that mix leader-only sources (SVV / pg_catalog) with compute-side sources (SYS) can trip Redshift's query optimizer with <code>Assert: Hash table for subplan does not exist (SQLSTATE XX000)</code> and similar internal errors.</li>
+</ol>
+<p>These two constraints require opposite materialization choices in different places.
+This document is the policy that reconciles them, followed by a reference list of Redshift-specific platform behaviors this package works around.</p>
+<hr />
+<h2 id="source-by-source-classification">Source-by-source classification<a class="headerlink" href="#source-by-source-classification" title="Permanent link">#</a></h2>
+<p>Every Redshift system source the package reads is classified as either <strong>current-state</strong> (a real-time view of what exists right now) or <strong>time-bounded log</strong> (a rolling window of historical events that Amazon ages out).
+The classification is sourced from <a href="https://docs.aws.amazon.com/redshift/latest/dg/cm_chap_system-tables.html#c_types-of-system-tables-and-views">AWS's official types-of-views documentation</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>View family</th>
+<th>Behavior</th>
+<th>Retention per AWS docs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pg_class</code></td>
+<td>pg_catalog</td>
+<td>Current state</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>pg_namespace</code></td>
+<td>pg_catalog</td>
+<td>Current state</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>pg_depend</code></td>
+<td>pg_catalog</td>
+<td>Current state</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>pg_rewrite</code></td>
+<td>pg_catalog</td>
+<td>Current state</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>svv_tables</code></td>
+<td>SVV</td>
+<td>Current state</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>svv_table_info</code></td>
+<td>SVV</td>
+<td>Current state</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>svv_columns</code></td>
+<td>SVV</td>
+<td>Current state</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>svv_alter_table_recommendations</code></td>
+<td>SVV</td>
+<td>Current state (advisor recs disappear once applied)</td>
+<td>N/A — current state</td>
+</tr>
+<tr>
+<td><code>sys_query_history</code></td>
+<td>SYS</td>
+<td>Time-bounded log</td>
+<td>Not explicitly stated in per-view docs. STL (the legacy equivalent) is documented as 7 days.</td>
+</tr>
+<tr>
+<td><code>sys_query_detail</code></td>
+<td>SYS</td>
+<td>Time-bounded log</td>
+<td>Same — not explicitly stated per-view, but bounded.</td>
+</tr>
+<tr>
+<td><code>sys_serverless_usage</code></td>
+<td>SYS</td>
+<td>Time-bounded log</td>
+<td>Explicitly documented: 7 days (<a href="https://docs.aws.amazon.com/redshift/latest/dg/SYS_SERVERLESS_USAGE.html">SYS_SERVERLESS_USAGE</a>).</td>
+</tr>
+<tr>
+<td><code>sys_connection_log</code></td>
+<td>SYS</td>
+<td>Time-bounded log</td>
+<td>Not explicitly stated per-view.</td>
+</tr>
+</tbody>
+</table>
+<p>AWS doesn't publish a per-view retention number for every SYS view.
+The SYS family clearly does age data out — that's its purpose — and the one view that documents retention explicitly (<code>SYS_SERVERLESS_USAGE</code>) states 7 days.
+Treat all SYS views as bounded with an assumed minimum window of 7 days unless AWS publishes something longer.</p>
+<hr />
+<h2 id="materialization-policy">Materialization policy<a class="headerlink" href="#materialization-policy" title="Permanent link">#</a></h2>
+<h3 id="staging-layer-modelsstagingredshift">Staging layer (<code>models/staging/redshift/</code>)<a class="headerlink" href="#staging-layer-modelsstagingredshift" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Source type</th>
+<th>Materialization</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pg_catalog passthrough (<code>pg_class</code>, <code>pg_namespace</code>, <code>pg_depend</code>, <code>pg_rewrite</code>)</td>
+<td><code>view</code></td>
+<td>Catalogs are tiny and current-state; materializing as a table is unnecessary.</td>
+</tr>
+<tr>
+<td>SVV current-state (<code>svv_tables</code>, <code>svv_table_info</code>, <code>svv_columns</code>, <code>svv_alter_table_recommendations</code>)</td>
+<td><code>table</code></td>
+<td>These are leader-only system views. Wrapping them as plain views propagates the leader-only constraint into every downstream join, and a downstream model joining multiple SVV sources with compute-side sources can trip the planner assertion above. Materializing as a table lands the data on compute nodes at the staging boundary. The rows are tiny (one per table or one per column), so the storage cost is trivial. List columns explicitly (not <code>select *</code>) to avoid view-resolution surprises.</td>
+</tr>
+<tr>
+<td>SYS time-bounded (<code>sys_query_history</code>, <code>sys_query_detail</code>, etc.)</td>
+<td><code>incremental</code></td>
+<td>Required for correctness — a plain view loses any rows that fall off Redshift's retention window between runs. Use a <code>start_time</code>-based incremental filter to accumulate history across runs.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="intermediate-layer-modelsintermediateredshift">Intermediate layer (<code>models/intermediate/redshift/</code>)<a class="headerlink" href="#intermediate-layer-modelsintermediateredshift" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model shape</th>
+<th>Materialization</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recursive CTEs (e.g., <code>int_redshift__view_chains</code>, <code>int_redshift__view_terminal_ancestors</code>)</td>
+<td><code>table</code></td>
+<td>Recursion itself works fine over an already-materialized parent table, but if a downstream consumer performs more than a simple column read against the recursive model's output (e.g. a lateral SUPER array unnest), leaving it as a <code>view</code> forces Redshift to re-inline the <code>WITH RECURSIVE</code> definition at query time, which is unreliable — it can either error outright or silently produce wrong aggregates.</td>
+</tr>
+<tr>
+<td>Models that join leader-only catalogs with compute-side data</td>
+<td><code>table</code></td>
+<td>Leader-only sources can't be joined to compute-side data inside a view definition. Materializing breaks the leader/compute boundary at this point.</td>
+</tr>
+<tr>
+<td>Recommendation-output intermediates that are queried with predicates by tests or a mart</td>
+<td><code>table</code></td>
+<td>Redshift's optimizer can fail to push filters through a multi-CTE view definition. Materializing the output as a table eliminates the planner-pushdown chain entirely.</td>
+</tr>
+<tr>
+<td>Pre-materialized building blocks (where a model is too complex for a single CTAS)</td>
+<td><code>table</code></td>
+<td>Break the model into smaller intermediates, each materialized as a table, and have the final model be a flat join across them.</td>
+</tr>
+<tr>
+<td>Anything else (simple passthroughs, joins between compute-side sources only)</td>
+<td><code>view</code></td>
+<td>Default. Cheap, no storage cost.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="marts-layer-modelsmartsredshift">Marts layer (<code>models/marts/redshift/</code>)<a class="headerlink" href="#marts-layer-modelsmartsredshift" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Materialization</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fct_redshift__warehouse_optimization_recommendations</code></td>
+<td><code>incremental</code></td>
+<td>Snapshot-per-day recommendation history. Append-only.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="known-redshift-platform-quirks">Known Redshift platform quirks<a class="headerlink" href="#known-redshift-platform-quirks" title="Permanent link">#</a></h2>
+<p>Reference list of Redshift-specific behaviors this package works around. Relevant if you're modifying a model that reads from <code>sys_query_history</code>, <code>sys_query_detail</code>, or the pg_catalog/SVV sources directly.</p>
+<ul>
+<li><strong><code>CREATE OR REPLACE VIEW</code> rejects column-type changes.</strong> If a staging model's cast changes between package versions, <code>CREATE OR REPLACE VIEW</code> fails with <code>SQLSTATE 42P16</code>. Remedy: <code>DROP VIEW IF EXISTS &lt;schema&gt;.&lt;view&gt; CASCADE;</code>, then re-run.</li>
+<li><strong><code>oid</code>-typed columns can't be persisted by CTAS.</strong> Any pg_catalog/SVV column exposing a native <code>oid</code> type (e.g. <code>pg_class.oid</code>, <code>svv_table_info.table_id</code>) must be cast to <code>bigint</code> in staging before a <code>table</code>-materialized model can select it.</li>
+<li><strong>Some window function patterns aren't supported.</strong> <code>COUNT(DISTINCT col) OVER (...)</code> and similar DISTINCT-aggregate window functions fail with <code>WINDOW definition is not supported (SQLSTATE XX000)</code>. Use <code>row_number()</code> plus a <code>GROUP BY</code> with conditional <code>MAX/SUM(CASE WHEN rn = ... THEN col END)</code> instead.</li>
+<li><strong>A SUPER unnest immediately followed by a join on the unnested value fails.</strong> <code>invalid join condition for SUPER unnest join (SQLSTATE 0A000)</code>. Isolate the unnest into its own CTE, extracting the element into a regular typed column, before joining on it.</li>
+<li><strong>CTAS infers a <code>varchar</code> column's width from a single CASE branch, not the widest one.</strong> A column built from a multi-branch <code>CASE</code> expression with varying string lengths can hit <code>value too long for type character varying(N) (SQLSTATE 22001)</code> once a longer branch fires on real data. Wrap the whole expression in an explicit <code>cast(... as varchar(N))</code> sized for the longest realistic branch.</li>
+<li><strong><code>sys_query_history</code>'s time columns (<code>elapsed_time</code>, <code>queue_time</code>, <code>execution_time</code>, <code>compile_time</code>, <code>planning_time</code>, <code>lock_wait_time</code>) are in microseconds, not milliseconds.</strong> Divide by <code>1,000,000</code>, not <code>1,000</code>, to get seconds.</li>
+<li><strong><code>sys_query_detail</code>'s <code>input_bytes</code> is always 0 for <code>scan</code> steps.</strong> A scan is a leaf node in the execution plan with no upstream step to receive input from. <code>output_bytes</code> is the column that reflects what a scan step actually read from storage.</li>
+<li><strong>A table's <code>table_id</code> changes on every rebuild.</strong> dbt's <code>table</code> materialization does <code>CREATE</code> + <code>RENAME</code> + <code>DROP</code> each time, assigning a new physical <code>table_id</code>. Any mechanism that needs to identify the same <em>logical</em> table across multiple historical rebuilds should match by name or by the dbt node_id embedded in the query comment, not by <code>table_id</code>.</li>
+<li><strong>A CTAS's <code>insert</code> step reports the temp object's <code>table_name</code>, not the final table's.</strong> dbt's table materialization inserts into a <code>__dbt_tmp</code>-suffixed temp relation before renaming it into place. Identifying a CTAS's real target by the insert step's <code>table_name</code> directly won't match a candidate table's real name; use the dbt node_id embedded in the query comment instead, or strip the <code>__dbt_tmp</code> suffix if node_id isn't available (e.g. for non-dbt-managed tables).</li>
+<li><strong>Late-binding views (<code>bind=false</code>) have no <code>pg_depend</code>/<code>pg_rewrite</code> entries at all.</strong> <code>bind=false</code> is a documented dbt-redshift production pattern (required for any view whose lineage touches an external or shared-storage table), so any mechanism that needs to resolve a view's dependencies should use the dbt manifest graph, not Redshift's own catalogs.</li>
+<li><strong>Redshift has no <code>microbatch</code> incremental strategy.</strong> Models that would receive <code>microbatch</code> on Snowflake receive <code>append</code> instead.</li>
+</ul>
+<hr />
+<h2 id="decision-flowchart-for-new-models">Decision flowchart for new models<a class="headerlink" href="#decision-flowchart-for-new-models" title="Permanent link">#</a></h2>
+<p>When you add a new model in this package, decide its materialization in this order:</p>
+<ol>
+<li><strong>Does it consume a SYS time-bounded source as a primary input?</strong>
+   → If yes, the staging model for that source must be <code>incremental</code>. The intermediate model can be <code>view</code> or <code>table</code> depending on planner-stability concerns.</li>
+<li><strong>Is it a recommendation-output intermediate</strong> (produces rows that a mart or tests query with <code>WHERE</code> filters)?
+   → <code>table</code>.</li>
+<li><strong>Does it join leader-only sources (SVV / pg_catalog) with compute-side sources (SYS)?</strong>
+   → <code>table</code> for the model where the join happens.</li>
+<li><strong>Does it use a recursive CTE?</strong>
+   → <code>table</code> if any downstream consumer does more than a simple column read against it (see the quirks list above); <code>view</code> is fine otherwise, but every recursive reference must be to an already-<code>table</code> ancestor.</li>
+<li><strong>Otherwise:</strong> <code>view</code>. Default.</li>
+</ol>
+<hr />
+<h2 id="open-questions-not-yet-resolved">Open questions / not yet resolved<a class="headerlink" href="#open-questions-not-yet-resolved" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Exact retention for <code>sys_query_history</code> and <code>sys_query_detail</code>.</strong> AWS publishes 7 days for <code>SYS_SERVERLESS_USAGE</code> and the legacy STL views, but no explicit number for the query SYS views. Until AWS clarifies, the package assumes ≥7-day retention, and the lookback variables (<code>table_materialization_lookback_days</code>, <code>incremental_candidates_lookback_days</code>) should be tuned to the customer's observed retention.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../incremental_config_recommendations/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Incremental config recommendations">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Incremental config recommendations
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../testing/" class="md-footer__link md-footer__link--next" aria-label="Next: Testing">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Testing
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.footer", "navigation.instant", "navigation.tracking", "content.action.edit", "content.code.copy", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3081 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Find cost optimization opportunities in your dbt project on Snowflake, Databricks, BigQuery and Redshift.">
+      
+      
+      
+        <link rel="canonical" href="https://dbt-labs.github.io/dbt-cost-optimization/2.0/snowflake/reference/gold_design/">
+      
+      
+        <link rel="prev" href="../../macros/">
+      
+      
+        <link rel="next" href="../warehouse_recommendations/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Gold layer - dbt Cost Optimization Package</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gold-layer-design-snowflake-cost-optimization" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="dbt Cost Optimization Package" class="md-header__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dbt Cost Optimization Package
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Gold layer
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="dbt Cost Optimization Package" class="md-nav__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    dbt Cost Optimization Package
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Snowflake
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick-use commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recommendations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recommendations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Purpose
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Purpose">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#two-audiences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two audiences
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-views" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Views
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Views">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__top_recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__top_recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__cost_savings_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__cost_savings_summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__optimization_backlog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__optimization_backlog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__dbt_model_optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__dbt_model_optimizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__warehouse_optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__warehouse_optimizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__top_expensive_queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__top_expensive_queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__top_spillage_models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__top_spillage_models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__top_queried_models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__top_queried_models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__ai_optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__ai_optimizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__cross_domain_insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__cross_domain_insights
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vw_snowflake__user_level_cost_attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vw_snowflake__user_level_cost_attribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-cost-estimation-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Cost Estimation Methodology
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Cost Estimation Methodology">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credit-rate-approach-list-rate-vs-amortized" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credit rate approach: list rate vs. amortized
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dollar-conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dollar conversion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#per-domain-cost-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-domain cost estimation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-effort-classification-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Effort Classification Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Effort Classification Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config_change-quick-wins-minutes-to-apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config_change — Quick wins (minutes to apply)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sql_refactor-needs-investigation-hours-to-days" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sql_refactor — Needs investigation (hours to days)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-design-work-required-days-to-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        architecture — Design work required (days to weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cross-domain-correlations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cross-Domain Correlations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Cross-Domain Correlations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#correlation-1-spillage-clustering-candidate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 1: Spillage + Clustering Candidate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-2-view-in-chain-downstream-spillage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 2: View in Chain + Downstream Spillage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-3-expensive-query-oversized-warehouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 3: Expensive Query + Oversized Warehouse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-4-same-model-in-multiple-environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 4: Same Model in Multiple Environments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-5-expensive-query-incremental-candidate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 5: Expensive Query + Incremental Candidate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-6-spillage-incremental-candidate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 6: Spillage + Incremental Candidate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-7-high-ai-spend-user-concentration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 7: High AI Spend + User Concentration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-8-materialization-candidate-expensive-downstream-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 8: Materialization Candidate + Expensive Downstream Query
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-9-clustering-candidate-expensive-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 9: Clustering Candidate + Expensive Query
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-10-oversized-warehouse-low-query-volume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 10: Oversized Warehouse + Low Query Volume
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-11-incremental-materialization-in-same-lineage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 11: Incremental + Materialization in Same Lineage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correlation-12-package-self-referential-spillage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlation 12: Package Self-Referential Spillage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-environment-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Environment Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Environment Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-deduplication-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How deduplication works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-identifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment identifiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leaving-out-dev-deployments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaving out dev deployments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project scoping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-environment-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-environment monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-limitations-and-assumptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Limitations and Assumptions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Limitations and Assumptions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cost-estimation-accuracy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost estimation accuracy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-we-cannot-estimate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What we cannot estimate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#assumptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Assumptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minimum-savings-threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum savings threshold
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../warehouse_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table materialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../table_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai_cortex_spend_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization_priorities_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization priorities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../warehouse_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future_optimizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/incremental_model_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/liquid_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/optimize_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPTIMIZE candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/model_run_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model run summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigQuery (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../bigquery/clustering_key_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clustering key candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redshift (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Redshift (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/materialization-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/dbt-labs/dbt-cost-optimization/edit/main/docs/snowflake/reference/gold_design.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="gold-layer-design-snowflake-cost-optimization">Gold Layer Design — Snowflake Cost Optimization<a class="headerlink" href="#gold-layer-design-snowflake-cost-optimization" title="Permanent link">#</a></h1>
+<p>This document specifies the design, methodology, and rules for the gold-layer dashboard views that sit on top of the domain-specific fact models.</p>
+<hr />
+<h2 id="1-purpose">1. Purpose<a class="headerlink" href="#1-purpose" title="Permanent link">#</a></h2>
+<p>The gold layer answers: <strong>"What should I do next?"</strong></p>
+<p>It transforms raw domain-specific recommendations (warehouse sizing, spillage, materialization, clustering, AI spend) into:
+- <strong>Prioritized action items</strong> ranked by estimated dollar impact
+- <strong>Cross-domain correlations</strong> that identify root causes spanning multiple domains
+- <strong>Effort-classified backlog items</strong> ready for human sprint planning or agent automation
+- <strong>KPI summaries</strong> for dashboard consumption</p>
+<h3 id="two-audiences">Two audiences<a class="headerlink" href="#two-audiences" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>What they need</th>
+<th>How they consume</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Humans</strong> (platform engineers, analytics engineers)</td>
+<td>Ranked action items, dollar estimates, quick wins highlighted</td>
+<td>Dashboard tiles, filtered views, drill-downs</td>
+</tr>
+<tr>
+<td><strong>Agents</strong> (Cortex Agents, CI automation, ticket bots)</td>
+<td>Structured fields, self-contained rows, node_id for code navigation</td>
+<td>SQL queries against gold views, snowflake_ddl/dbt_model_config fields for auto-apply</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-views">2. Views<a class="headerlink" href="#2-views" title="Permanent link">#</a></h2>
+<h3 id="vw_snowflake__top_recommendations"><code>vw_snowflake__top_recommendations</code><a class="headerlink" href="#vw_snowflake__top_recommendations" title="Permanent link">#</a></h3>
+<p><strong>The flagship view.</strong> P1+P2 recommendations across all domains, deduplicated per entity (highest savings as representative). Includes related signal count for context.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>priority_rank</code></td>
+<td>int</td>
+<td>Dense rank by priority_tier ASC, savings DESC</td>
+</tr>
+<tr>
+<td><code>domain</code></td>
+<td>string</td>
+<td>warehouse / materialization / clustering / ai</td>
+</tr>
+<tr>
+<td><code>signal_id</code></td>
+<td>string</td>
+<td>Machine-readable signal identifier</td>
+</tr>
+<tr>
+<td><code>priority_tier</code></td>
+<td>int</td>
+<td>Per-entity relative priority (1 = do first)</td>
+</tr>
+<tr>
+<td><code>node_id</code></td>
+<td>string</td>
+<td>Logical dbt model identifier (nullable)</td>
+</tr>
+<tr>
+<td><code>model_name</code></td>
+<td>string</td>
+<td>Human-readable model name</td>
+</tr>
+<tr>
+<td><code>warehouse_name</code></td>
+<td>string</td>
+<td>Relevant warehouse</td>
+</tr>
+<tr>
+<td><code>recommendation</code></td>
+<td>string</td>
+<td>Short action text</td>
+</tr>
+<tr>
+<td><code>recommendation_reason</code></td>
+<td>string</td>
+<td>Detailed evidence with metrics</td>
+</tr>
+<tr>
+<td><code>estimated_annual_cost_usd</code></td>
+<td>float</td>
+<td>"If unchanged, expect this yearly cost"</td>
+</tr>
+<tr>
+<td><code>estimated_annual_savings_usd</code></td>
+<td>float</td>
+<td>"If fixed, save this amount yearly"</td>
+</tr>
+<tr>
+<td><code>related_signals_count</code></td>
+<td>int</td>
+<td>Other signals for this entity (shows compound opportunity)</td>
+</tr>
+<tr>
+<td><code>snapshot_date</code></td>
+<td>date</td>
+<td>When this analysis was produced</td>
+</tr>
+</tbody>
+</table>
+<p>Filters to P1+P2 per entity. Ordered by priority_tier, then savings DESC. One row per entity (deduplicated to highest-savings representative).</p>
+<hr />
+<h3 id="vw_snowflake__cost_savings_summary"><code>vw_snowflake__cost_savings_summary</code><a class="headerlink" href="#vw_snowflake__cost_savings_summary" title="Permanent link">#</a></h3>
+<p><strong>KPI card view.</strong> One row per domain showing total opportunity.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>domain</code></td>
+<td>string</td>
+<td>warehouse / materialization / clustering / ai</td>
+</tr>
+<tr>
+<td><code>total_recommendations</code></td>
+<td>int</td>
+<td>Count of actionable items in this domain</td>
+</tr>
+<tr>
+<td><code>quick_win_count</code></td>
+<td>int</td>
+<td>Count where effort_category = 'config_change'</td>
+</tr>
+<tr>
+<td><code>estimated_annual_cost_usd</code></td>
+<td>float</td>
+<td>Total current projected cost for this domain</td>
+</tr>
+<tr>
+<td><code>estimated_annual_savings_usd</code></td>
+<td>float</td>
+<td>Total savings if all recommendations applied</td>
+</tr>
+<tr>
+<td><code>savings_pct</code></td>
+<td>float</td>
+<td>savings / cost as a percentage</td>
+</tr>
+<tr>
+<td><code>top_recommendation</code></td>
+<td>string</td>
+<td>Preview text of the #1 savings item</td>
+</tr>
+<tr>
+<td><code>top_recommendation_savings_usd</code></td>
+<td>float</td>
+<td>Dollar amount of the single biggest opportunity</td>
+</tr>
+</tbody>
+</table>
+<p>Expected output: 4-5 rows (one per domain with data).</p>
+<hr />
+<h3 id="vw_snowflake__optimization_backlog"><code>vw_snowflake__optimization_backlog</code><a class="headerlink" href="#vw_snowflake__optimization_backlog" title="Permanent link">#</a></h3>
+<p><strong>Sprint planning / agent intake view.</strong> Full optimization inventory across ALL priority tiers.</p>
+<p>Includes all detected signals (actionable + monitor). Users filter by <code>priority_tier</code> to focus on specific tiers. Each row is self-contained — an agent can create a ticket from any single row.</p>
+<p>Key columns:
+- <code>priority_tier</code>: per-entity relative priority (1 = do first for this entity)
+- <code>hierarchy_rank</code>: fixed position in the optimization decision hierarchy
+- <code>signal_id</code>: machine-readable signal identifier
+- <code>effort_category</code>: config_change / actionable_review / sql_refactor / investigation
+- <code>action_type</code>: 'snowflake_ddl' / 'dbt_config' / 'investigation' — makes clear which column to use
+- <code>dbt_model_config</code>: copy-pasteable dbt config block
+- <code>snowflake_ddl</code>: SQL to execute directly in Snowflake
+- <code>blocking_signals</code> / <code>next_evidence_needed</code>: for investigate items</p>
+<p>Ordered by: <code>priority_tier ASC</code>, then <code>estimated_annual_savings_usd DESC</code>.</p>
+<hr />
+<h3 id="vw_snowflake__dbt_model_optimizations"><code>vw_snowflake__dbt_model_optimizations</code><a class="headerlink" href="#vw_snowflake__dbt_model_optimizations" title="Permanent link">#</a></h3>
+<p><strong>dbt engineer view.</strong> Only ACTIONABLE items — things with templates ready to copy-paste and test. Excludes <code>investigate</code> and <code>do_not_recommend</code> statuses (those are in the backlog).</p>
+<p>Covers: materialization changes, clustering keys, and incremental configs with <code>actionable_review</code> status.
+Ordered by <code>model_name, priority_tier</code> so all optimizations for a model are grouped together.</p>
+<p>Key columns:
+- <code>priority_tier</code>: per-entity relative priority (1 = do first for this model based on hierarchy)
+- <code>suggested_clustering_key</code>: ready-to-use clustering key columns
+- <code>dbt_model_config</code>: copy-paste config block (materialization, incremental, cluster_by)
+- <code>identified_unique_key</code>: confirmed unique key name (NULL for append strategies)
+- <code>incremental_confidence_score</code>: 0-100 confidence in incremental template (NULL if no strategy proposed)
+- <code>incremental_blocking_signals</code>: factors reducing confidence
+- <code>environment_ids</code>: array of dbt_cloud_environment_ids where this model exists</p>
+<hr />
+<h3 id="vw_snowflake__warehouse_optimizations"><code>vw_snowflake__warehouse_optimizations</code><a class="headerlink" href="#vw_snowflake__warehouse_optimizations" title="Permanent link">#</a></h3>
+<p><strong>Snowflake admin view.</strong> One row per (warehouse, signal category). Config recs are standalone. Model-level signals (spillage, expensive queries) are aggregated with linked model context.</p>
+<p>Key columns:
+- <code>warehouse_current_size</code>: authoritative size from WAREHOUSE_EVENTS_HISTORY
+- <code>warehouse_category</code>: standard / gen2 / multi_cluster / adaptive
+- <code>signal_id</code>: signal type (idle_reduce_auto_suspend, spillage_moderate_worsening, etc.)
+- <code>priority_tier</code>: per-warehouse relative priority
+- <code>snowflake_ddl</code>: concrete ALTER WAREHOUSE DDL (for config recs)
+- <code>affected_model_count</code>: count of models contributing to this signal
+- <code>affected_models</code>: comma-separated list of affected model names
+- <code>recommendation_reason</code>: for aggregated signals, includes "resolve model-level optimizations first" guidance</p>
+<p>Expensive queries are surfaced separately in <code>vw_snowflake__top_expensive_queries</code>.</p>
+<hr />
+<h3 id="vw_snowflake__top_expensive_queries"><code>vw_snowflake__top_expensive_queries</code><a class="headerlink" href="#vw_snowflake__top_expensive_queries" title="Permanent link">#</a></h3>
+<p><strong>Cost accountability view.</strong> Top 10 most expensive recurring queries within the project scope, enriched with co-occurring optimization signals.</p>
+<p>Key columns:
+- <code>query_hash</code>: unique identifier for this recurring query pattern
+- <code>estimated_annual_cost_usd</code>: projected annual cost at current run rate
+- <code>recommendation</code>: actionable recommendation for this query
+- <code>model_name</code> / <code>node_id</code>: the dbt model this query builds (when attributable)
+- <code>co_occurring_fixes</code>: when co-signals exist, shows "Actionable — clustering + incremental optimization(s) available"
+- <code>co_signal_count</code>: number of co-occurring optimization signals for this model</p>
+<hr />
+<h3 id="vw_snowflake__top_spillage_models"><code>vw_snowflake__top_spillage_models</code><a class="headerlink" href="#vw_snowflake__top_spillage_models" title="Permanent link">#</a></h3>
+<p><strong>Performance engineering view.</strong> Models causing the most memory spillage, with dbt platform run traceability.</p>
+<p>Key columns:
+- <code>model_name</code> / <code>node_id</code>: the dbt model
+- <code>model_source</code>: 'project' or 'installed_package'
+- <code>total_gb_spilled</code>: aggregate spillage across runs
+- <code>spill_trend</code>: Worsening / Improving / Stable
+- <code>priority_tier</code>: per-entity relative priority from int_all_recommendations
+- <code>signal_id</code>: primary (lowest-tier) spillage signal for this model
+- <code>spillage_signal_count</code>: number of distinct spillage signals (e.g., scale_up + moderate)
+- <code>all_spillage_signals</code>: comma-separated list of all spillage signal_ids
+- <code>last_spilling_run_id</code> / <code>last_spilling_job_id</code>: dbt platform run and job IDs for the most recent spilling execution
+- <code>warehouse_name</code>: warehouse where spillage occurred</p>
+<p>Filtered to models only (dbt_model IS NOT NULL). Includes installed packages since they run on your warehouse.</p>
+<hr />
+<h3 id="vw_snowflake__top_queried_models"><code>vw_snowflake__top_queried_models</code><a class="headerlink" href="#vw_snowflake__top_queried_models" title="Permanent link">#</a></h3>
+<p><strong>Platform engineering view.</strong> Top 25 most-queried models by SELECT consumption pressure.</p>
+<p>Key columns:
+- <code>model_name</code> / <code>node_id</code>: the dbt model
+- <code>total_select_count</code>: SELECT queries hitting this model in the analysis window
+- <code>total_select_credits</code>: estimated credits consumed by downstream reads
+- <code>avg_select_duration_sec</code>: average query duration</p>
+<p>Joins <code>int_snowflake__table_query_stats_daily</code> to <code>int_dbt__relations</code> to identify which models receive the most downstream consumption.</p>
+<hr />
+<h3 id="vw_snowflake__ai_optimizations"><code>vw_snowflake__ai_optimizations</code><a class="headerlink" href="#vw_snowflake__ai_optimizations" title="Permanent link">#</a></h3>
+<p><strong>AI/ML team view.</strong> Model cost (downgrade, prompt bloat, batching), token efficiency (failure rates, I/O ratios, caching), agent cost trends, and spend overview.</p>
+<p>Key columns: <code>service_or_model</code>, <code>estimated_annual_savings_usd</code></p>
+<hr />
+<h3 id="vw_snowflake__cross_domain_insights"><code>vw_snowflake__cross_domain_insights</code><a class="headerlink" href="#vw_snowflake__cross_domain_insights" title="Permanent link">#</a></h3>
+<p><strong>Multi-signal correlation view.</strong> Reads from <code>int_snowflake__all_recommendations</code> (single source of truth). For each model with 2+ optimization signals from different categories, surfaces the signal array and picks the primary recommendation based on priority_tier.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model_name</code></td>
+<td>string</td>
+<td>The dbt model with multi-signal correlation</td>
+</tr>
+<tr>
+<td><code>signals</code></td>
+<td>string</td>
+<td>Comma-separated signal categories (e.g., 'spillage,clustering,incremental')</td>
+</tr>
+<tr>
+<td><code>signal_count</code></td>
+<td>int</td>
+<td>Number of distinct signal categories (2+ for this view)</td>
+</tr>
+<tr>
+<td><code>primary_recommendation</code></td>
+<td>string</td>
+<td>Recommendation text from lowest priority_tier signal</td>
+</tr>
+<tr>
+<td><code>primary_domain</code></td>
+<td>string</td>
+<td>Domain of the primary recommendation</td>
+</tr>
+<tr>
+<td><code>root_cause</code></td>
+<td>string</td>
+<td>Why these signals co-occur</td>
+</tr>
+<tr>
+<td><code>recommended_action</code></td>
+<td>string</td>
+<td>The model's own top action, plus the view chain addendum (below)</td>
+</tr>
+<tr>
+<td><code>upstream_view_chain</code></td>
+<td>string</td>
+<td>Views and ephemerals the model's builds recompute inline, nearest first, e.g. <code>int_order_item_summary (ephemeral), int_customer_order_items_geo (view)</code></td>
+</tr>
+<tr>
+<td><code>upstream_view_count</code></td>
+<td>int</td>
+<td>How many</td>
+</tr>
+<tr>
+<td><code>chain_recommended_view</code></td>
+<td>string</td>
+<td>The chain's recommended view to materialize (from <code>fct_snowflake__table_materialization_candidates</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Filters to <code>backlog_status IN ('actionable', 'monitor')</code> to include spillage and expensive query signals alongside actionable recommendations. Primary recommendation is derived from <code>min_by(recommendation, priority_tier)</code> — the signal with the lowest (best) priority_tier for that entity.</p>
+<p>Signal categories: spillage, clustering, incremental, materialization, expensive_query, and view_chain. A row needs 2+ distinct categories.</p>
+<p><strong><code>view_chain</code></strong> marks a table whose builds recompute upstream views and ephemerals inline (<code>int_snowflake__table_upstream_views</code>). It counts toward the two-signal minimum: it's effectively a materialization recommendation surfacing on the chain's end table, and it links spillage or cost to the chain.</p>
+<p><strong>Recommended action with a view chain.</strong> The headline stays the model's own top action (materialization → incremental → clustering). When the model also has spillage or an expensive query, the chain is part of the cause, so the action adds the chain's recommended view:</p>
+<ul>
+<li><em>Own action + chain + spillage:</em> "Convert to incremental — …; additionally, materialize <code>int_order_items_vw</code> as a table: this model's builds recompute 3 upstream view(s), which adds to its spill." With an expensive query instead: "which adds to its cost."</li>
+<li><em>Chain + spillage (or expensive query), no other action:</em> the chain is the headline: "Materialize <code>int_order_items_vw</code> as a table: …"</li>
+<li><em>No view to name</em> (only ephemerals upstream, or no candidate view): "Its builds recompute N upstream view(s), …. See <code>vw_snowflake__dbt_model_optimizations</code>."</li>
+<li><em>Chain + another action, no spillage or expensive query:</em> the model's own action, unchanged.</li>
+</ul>
+<p>The root cause appends the chain's part the same way ("Builds recompute N upstream view(s) inline, enlarging the working set that spills").</p>
+<hr />
+<h3 id="vw_snowflake__user_level_cost_attribution"><code>vw_snowflake__user_level_cost_attribution</code><a class="headerlink" href="#vw_snowflake__user_level_cost_attribution" title="Permanent link">#</a></h3>
+<p><strong>Manager/chargeback view.</strong> User-level cost attribution across three categories: dbt build users, consumption users (SELECT queries against project models), and AI users.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user_name</code></td>
+<td>string</td>
+<td>Snowflake user</td>
+</tr>
+<tr>
+<td><code>role_name</code></td>
+<td>string</td>
+<td>Primary role</td>
+</tr>
+<tr>
+<td><code>build_credits_30d</code></td>
+<td>float</td>
+<td>Credits from dbt model builds (INSERT/MERGE/CTAS in dbt sessions)</td>
+</tr>
+<tr>
+<td><code>consumption_credits_30d</code></td>
+<td>float</td>
+<td>Credits from SELECT queries against project models</td>
+</tr>
+<tr>
+<td><code>ai_credits_30d</code></td>
+<td>float</td>
+<td>Credits from AI/Cortex usage</td>
+</tr>
+<tr>
+<td><code>combined_credits_30d</code></td>
+<td>float</td>
+<td>Total credits across all categories</td>
+</tr>
+<tr>
+<td><code>estimated_annual_cost_usd</code></td>
+<td>float</td>
+<td>Projected annual cost</td>
+</tr>
+<tr>
+<td><code>primary_warehouse</code></td>
+<td>string</td>
+<td>Warehouse used for builds (builders only)</td>
+</tr>
+<tr>
+<td><code>user_category</code></td>
+<td>string</td>
+<td>builder / consumer / ai_user / mixed</td>
+</tr>
+<tr>
+<td><code>build_query_count</code></td>
+<td>int</td>
+<td>Number of build queries (INSERT/MERGE/CTAS) in last 30 days</td>
+</tr>
+<tr>
+<td><code>consumption_query_count</code></td>
+<td>int</td>
+<td>Number of SELECT queries against project models in last 30 days</td>
+</tr>
+<tr>
+<td><code>ai_query_count</code></td>
+<td>int</td>
+<td>Number of AI/Cortex queries in last 30 days</td>
+</tr>
+<tr>
+<td><code>recommendation</code></td>
+<td>string</td>
+<td>Action/awareness text</td>
+</tr>
+<tr>
+<td><code>credits_from_attribution</code></td>
+<td>boolean</td>
+<td>True when any credits came from <code>QUERY_ATTRIBUTION_HISTORY</code> (precise). False = all estimated from elapsed x list rate</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-cost-estimation-methodology">3. Cost Estimation Methodology<a class="headerlink" href="#3-cost-estimation-methodology" title="Permanent link">#</a></h2>
+<h3 id="credit-rate-approach-list-rate-vs-amortized">Credit rate approach: list rate vs. amortized<a class="headerlink" href="#credit-rate-approach-list-rate-vs-amortized" title="Permanent link">#</a></h3>
+<p>The package uses two different credit rates depending on the purpose:</p>
+<p><strong>Forward-looking savings/cost estimates</strong> (in <code>int_snowflake__all_recommendations</code> and all gold views) use Snowflake's <strong>published list rate</strong> — the fixed credits-per-hour for a warehouse's size, looked up from the warehouse that actually builds each model (via the <code>model_warehouses</code> CTE). This is the marginal cost of compute time and correctly estimates what users would save by optimizing. The <code>warehouse_credits_per_hour</code> macro maps a size column to the list rate:</p>
+<table>
+<thead>
+<tr>
+<th>Size</th>
+<th>Credits/Hour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X-Small</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Large</td>
+<td>8</td>
+</tr>
+<tr>
+<td>X-Large</td>
+<td>16</td>
+</tr>
+<tr>
+<td>2X-Large</td>
+<td>32</td>
+</tr>
+<tr>
+<td>3X-Large</td>
+<td>64</td>
+</tr>
+<tr>
+<td>4X-Large</td>
+<td>128</td>
+</tr>
+<tr>
+<td>5X-Large</td>
+<td>256</td>
+</tr>
+<tr>
+<td>6X-Large</td>
+<td>512</td>
+</tr>
+</tbody>
+</table>
+<p>The rate is sourced from <code>int_snowflake__warehouse_config.current_size</code> (populated by the <code>refresh_warehouse_config</code> post-hook from SHOW WAREHOUSES). For warehouses without a known size, the fallback is 1 credit/hour (X-Small) — conservative, underestimates rather than overestimates. The fallback applies when:
+- <strong>A model has no build warehouse:</strong> no query in the last 30 days carries its <code>node_id</code> in a dbt query comment (for example, a model that hasn't run recently, or one whose queries were issued without dbt's query comment).
+- <strong>The warehouse has no known size:</strong> it's missing from <code>int_snowflake__warehouse_config</code>, because it has no <code>WAREHOUSE_CONSISTENT</code> event in <code>WAREHOUSE_EVENTS_HISTORY</code> and isn't visible to <code>SHOW WAREHOUSES</code> for the package's role (for example, a warehouse that has since been dropped).
+- <strong>The size value isn't recognized:</strong> it isn't one of the sizes in the table above.</p>
+<p><strong>Backwards-looking cost attribution</strong> (in <code>vw_snowflake__user_level_cost_attribution</code>) uses <strong>QUERY_ATTRIBUTION_HISTORY</strong> as the primary source, with elapsed x list rate as the fallback:</p>
+<ul>
+<li><strong>Primary:</strong> <code>credits_attributed_compute</code> from <code>QUERY_ATTRIBUTION_HISTORY</code> — exact per-query credits that correctly handle multi-cluster, Snowpark-optimized, Gen2, and concurrency splitting. Available on all editions (data from Aug 2024 onward).</li>
+<li><strong>Fallback:</strong> When QAH has no row (short queries &lt;= ~100ms, or queries before Aug 2024), credits are estimated as <code>elapsed_time × credits_per_hour / 3600</code> using the warehouse's list rate. This matches the savings rate exactly.</li>
+<li>The <code>credits_from_attribution</code> column flags whether any of a user's credits came from QAH data.</li>
+</ul>
+<p>Note: For view materialization recommendations, the build warehouse is used as a proxy for the readers' warehouse. This is accurate for dbt-to-dbt lineage but may understate costs when BI tools read the view from a different warehouse.</p>
+<p><strong>Why the split?</strong> Savings estimates need the list rate because it reflects the actual cost of compute time — a query running for 30 seconds on a Medium warehouse genuinely costs 4/3600 x 30 credits. Using an amortized rate (daily credits / 86,400) would understate savings for any warehouse that doesn't run 24/7. Attribution uses QAH because it correctly handles concurrency (splitting credits across concurrent queries) and warehouse-type pricing (Gen2, Snowpark-optimized, MCW). Where QAH isn't available, the list rate fallback prices each query as though it had the warehouse to itself — an upper bound that ensures completeness.</p>
+<p><strong>Known limitations of the list rate:</strong>
+- <strong>Gen2 and Snowpark-optimized warehouses</strong> cost more per hour than the standard list rate. QAH handles these correctly; the list rate fallback does not.
+- <strong>Multi-cluster warehouses</strong> cost a multiple of the list rate per cluster. QAH splits this correctly; the list rate prices at one cluster.
+- <strong>Concurrency:</strong> Pricing a query's elapsed time at the full list rate assumes it had the warehouse to itself, so it's an upper bound when queries run concurrently. QAH splits correctly.</p>
+<h3 id="dollar-conversion">Dollar conversion<a class="headerlink" href="#dollar-conversion" title="Permanent link">#</a></h3>
+<p>All dollar estimates use the configurable <code>credit_rate_usd</code> variable (default: $2/credit). Users should set this to their contract rate.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>estimated_annual_cost_usd = annual_credits × credit_rate_usd
+</span></code></pre></div>
+<h3 id="per-domain-cost-estimation">Per-domain cost estimation<a class="headerlink" href="#per-domain-cost-estimation" title="Permanent link">#</a></h3>
+<h4 id="warehouse-idle-credit-savings">Warehouse idle credit savings<a class="headerlink" href="#warehouse-idle-credit-savings" title="Permanent link">#</a></h4>
+<p>Idle credit savings are computed per-recommendation-key using actual event data from <code>WAREHOUSE_EVENTS_HISTORY</code>, not hardcoded assumptions:</p>
+<table>
+<thead>
+<tr>
+<th>Recommendation Key</th>
+<th>Savings Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>idle_reduce_auto_suspend</code></td>
+<td><code>autosuspend_cycles_30d × (current_auto_suspend - 60) / 3600 × credits_per_hour × 12 × credit_rate_usd</code></td>
+</tr>
+<tr>
+<td><code>idle_switch_scaling_policy</code></td>
+<td><code>mcw_spindown_cycles_30d × 150 / 3600 × credits_per_hour × 12 × credit_rate_usd</code></td>
+</tr>
+<tr>
+<td><code>idle_reduce_max_clusters</code></td>
+<td>Same as scaling policy (fewer clusters = fewer spindown idle periods)</td>
+</tr>
+<tr>
+<td><code>idle_reduce_min_clusters</code></td>
+<td><code>(min_cluster_count - 1) × credits_per_hour × idle_pct × 720 × 12 × credit_rate_usd</code></td>
+</tr>
+<tr>
+<td><code>idle_consolidate_underloaded</code></td>
+<td><code>total_idle_credits_30d × 12 × credit_rate_usd</code> (full elimination)</td>
+</tr>
+<tr>
+<td><code>idle_consolidate_standard</code></td>
+<td><code>total_idle_credits_30d × 0.5 × 12 × credit_rate_usd</code> (conservative 50%)</td>
+</tr>
+<tr>
+<td><code>idle_enable_mcw_bursty</code></td>
+<td>null (adds cost; benefit is reduced queuing, not idle savings)</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>autosuspend_cycles_30d</code> and <code>mcw_spindown_cycles_30d</code> come from <code>int_snowflake__warehouse_suspend_cycles</code>, derived from SUSPEND_WAREHOUSE and SUSPEND_CLUSTER events in <code>WAREHOUSE_EVENTS_HISTORY</code>.</p>
+<p><strong>Why not use total_idle_credits?</strong> On high-throughput warehouses, most idle credits are normal inter-query overhead (the warehouse is running but between query executions). Auto-suspend changes only affect the idle time during actual suspend cycles, not the inter-query overhead.</p>
+<h4 id="warehouse-sizing-scale-down-oversized">Warehouse sizing (scale down / oversized)<a class="headerlink" href="#warehouse-sizing-scale-down-oversized" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current annual cost</td>
+<td><code>total_credits_30d × 12 × credit_rate_usd</code></td>
+</tr>
+<tr>
+<td>Savings (oversized / scale down)</td>
+<td><code>total_credits_30d × 0.50 × 12 × credit_rate_usd</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="expensive-queries">Expensive queries<a class="headerlink" href="#expensive-queries" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current annual cost</td>
+<td><code>estimated_annual_cost_usd</code> (already computed in fact model)</td>
+</tr>
+<tr>
+<td>Savings</td>
+<td>Conservative 20% reduction estimate (refactoring typically achieves 20-80%)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="materialization-view-table">Materialization (view → table)<a class="headerlink" href="#materialization-view-table" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current annual cost</td>
+<td><code>(select_count + downstream_build_count) × recompute_cost_s × credits_per_hour / 3600 × (365 / lookback_days) × credit_rate_usd</code></td>
+</tr>
+<tr>
+<td>Savings</td>
+<td><code>max(select_count + downstream_build_count - view_build_runs, 0) × recompute_cost_s × credits_per_hour / 3600 × (365 / lookback_days) × credit_rate_usd</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>lookback_days</code> is <code>table_materialization_lookback_days</code> (default 14), the window all three counts cover, so <code>365 / lookback_days</code> annualizes them.</p>
+<p>Logic: a view's query runs on every read (<code>select_count</code>) and on every build of a table it feeds (<code>downstream_build_count</code>). Materialized, it runs once per dbt run instead (<code>view_build_runs</code>, the number of times dbt created the view in the window). Savings are the runs that go away, so they can't exceed the cost.</p>
+<ul>
+<li><strong><code>downstream_build_count</code></strong> counts builds of every table downstream of the view through views and ephemerals only: CTAS and MERGE statements tagged with the downstream model's <code>node_id</code> in dbt's query comment. Known edges: an incremental model merged through a temporary table counts twice per run; one appended through a temporary view counts zero.</li>
+<li><strong><code>view_build_runs</code></strong> counts CREATE_VIEW statements tagged with the view's <code>node_id</code>, minimum 1.</li>
+<li><strong><code>recompute_cost_s</code></strong> is the seconds one run of the view's query takes: measured by the view probe (<code>select hash_agg(*) from &lt;view&gt;</code>, result cache off, in <code>int_snowflake__view_probe</code>) when there is one, else the view's average read duration (<code>recompute_cost_source</code> says which). Read durations understate a view deep in a chain: a filtered read of it is cheap, but a downstream build recomputes all of it, plus every view above it. Each downstream build is charged this time, not the downstream model's whole build time: materializing removes the view's share of the build, not the build.</li>
+</ul>
+<p><strong>One view per chain.</strong> Every view in a chain gets the same downstream builds, so materializing any of them removes that recompute: they're alternatives, not additions. For each table at the end of a chain, the candidate view with the highest net savings (<code>net_recompute_s_saved</code>; ties go to the view nearest the table) is <code>chain_role = 'recommended'</code> and actionable. The others are <code>'alternative'</code>, with status <code>monitor</code> and a reason naming the recommended view, so the cost-savings summary counts the chain once. A view feeding several tables is recommended if it wins for any of them. Ephemerals are never candidates (no relation to read or probe); a view below an ephemeral is probed with the ephemeral inlined, so it's credited with the ephemeral's work.</p>
+<h4 id="spillage">Spillage<a class="headerlink" href="#spillage" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current annual cost</td>
+<td><code>spilling_execution_s × credits_per_hour / 3600 × (365 / spillage_lookback_days) × credit_rate_usd</code></td>
+</tr>
+<tr>
+<td>Savings, SQL refactor</td>
+<td><code>spill_blocked_s_total × credits_per_hour / 3600 × (365 / spillage_lookback_days) × credit_rate_usd</code>; null without operator stats</td>
+</tr>
+<tr>
+<td>Savings, scale-up</td>
+<td>null: see hours saved and cost change</td>
+</tr>
+<tr>
+<td>Hours saved, scale-up</td>
+<td><code>spilling_execution_s × (1 − 1 / (2 × eff)) / 3600 × (365 / spillage_lookback_days)</code></td>
+</tr>
+<tr>
+<td>Cost change, scale-up</td>
+<td><code>spilling_execution_s × credits_per_hour / 3600 × (1 / eff − 1) × (365 / spillage_lookback_days) × credit_rate_usd</code> (positive = costs more)</td>
+</tr>
+<tr>
+<td>Hours saved, SQL refactor</td>
+<td><code>spill_blocked_s_total / 3600 × (365 / spillage_lookback_days)</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>spilling_execution_s</code> (on <code>fct_snowflake__warehouse_performance_recommendations</code>) is the measured runtime of the table's spilling queries in the <code>spillage_lookback_days</code> window (default 30), attributed to the table through <code>ACCESS_HISTORY</code>, the same attribution as the spilled GB. The table's warehouse is the one its spilling queries spilled most on, and <code>credits_per_hour</code> is that warehouse's list rate. The aggregate (per-warehouse) spillage recommendation uses the same calculation over all of the warehouse's spilling queries.</p>
+<p><strong>Scale-ups trade credits for time.</strong> A calibration on spilling dbt builds halved their runtime at roughly the same credits, so a scale-up's dollar savings can't be told apart from zero, and its savings are null. Instead, <code>estimated_annual_hours_saved</code> and <code>estimated_annual_cost_change_usd</code> state the trade, and the reason text says it ("about 1.7x faster (… hours a year), about +16% credits"). <code>eff</code> is the efficiency of the step up from the warehouse's current size (<code>warehouse_scale_up_efficiency</code>), from the Snowflake Summit session "Beyond Code: Right-Sizing Your Warehouse" (one complex query on every size):</p>
+<table>
+<thead>
+<tr>
+<th>Step up from</th>
+<th>X-Small, Small</th>
+<th>Medium</th>
+<th>Large</th>
+<th>X-Large</th>
+<th>2X-Large</th>
+<th>3X–5X-Large</th>
+<th>6X-Large</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eff</td>
+<td>1.00</td>
+<td>0.86</td>
+<td>0.92</td>
+<td>0.86</td>
+<td>0.85</td>
+<td>0.81</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+<p>At <code>eff</code>, the runtime falls to <code>T / (2 × eff)</code> at twice the rate. Our own calibration measured 0.91–0.97 for X-Small → Small on spilling queries. Scaling up reduces spill; eliminating it may also need the model's SQL or materialization changed.</p>
+<p><strong>SQL refactors are priced from measured spill.</strong> The <code>extract_spill_evidence</code> post-hook reads <code>GET_QUERY_OPERATOR_STATS</code> for a sample of each spilling table's queries (the most recent per query shape, last 14 days, into <code>int_snowflake__query_spill_evidence</code>). For each, <code>spill_blocked_s</code> is the execution time × the disk I/O share of the operators with spilling statistics; other disk I/O (scans, cache reads) isn't spill. The sample is scaled to all the table's spilling queries: <code>spill_blocked_s_total = sampled blocked_s × spilling_execution_s / sampled execution_s</code>. Blocked time is a lower bound on what removing the spill saves. Without operator stats (no MONITOR on the warehouse, or queries older than 14 days) the savings and hours are null.</p>
+<p><strong>Job-level spillage.</strong> Per-table and per-warehouse spillage miss a common pattern: a few models dominate a dbt job's build time by spilling. <code>int_snowflake__dbt_job_spillage</code> rolls each job's builds up over the window (jobs from <code>dbt_cloud_job_id</code> in dbt's query comment; for runs outside the dbt platform, add <code>invocation_id</code> to your <code>query-comment</code> and each invocation is treated as a one-run job):</p>
+<table>
+<thead>
+<tr>
+<th>Model share (spilling / built)</th>
+<th>Time share (spilling models' build time / all)</th>
+<th>Signal</th>
+<th>Status</th>
+<th>Rank</th>
+<th>Surfaces in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>≤ 25%</td>
+<td>≥ 75%</td>
+<td><code>spillage_route_models</code></td>
+<td>actionable</td>
+<td>4</td>
+<td><code>vw_snowflake__dbt_model_optimizations</code> (one row per routed model, with a <code>snowflake_warehouse</code> config)</td>
+</tr>
+<tr>
+<td>&gt; 25%</td>
+<td>≥ 75%</td>
+<td><code>spillage_job_scale_up</code></td>
+<td>actionable</td>
+<td>4</td>
+<td><code>vw_snowflake__warehouse_optimizations</code> (entity <code>dbt job &lt;id&gt;</code>)</td>
+</tr>
+<tr>
+<td>either</td>
+<td>25–75%</td>
+<td>the same signal, by model share</td>
+<td>monitor</td>
+<td>5</td>
+<td>same</td>
+</tr>
+<tr>
+<td>any</td>
+<td>&lt; 25%</td>
+<td>none</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The thresholds are the <code>spillage_job_*</code> vars. Routing and sizing up are alternatives for the same job, so a job gets one or the other. Routing names the size one up, not a warehouse: the package can't tell who owns a warehouse or whether your role can use it, so the config is <code>snowflake_warehouse='&lt;larger warehouse&gt;'</code> for you to fill in. A job size-up includes DDL unless other jobs share the warehouse; then it recommends a dedicated warehouse instead of resizing the shared one. Both are priced like scale-ups: cost from build time (the routed model's, or the whole job's), savings null, and hours saved and cost change from the efficiency curve.</p>
+<p>Null savings aren't demoted by <code>min_annual_savings_usd</code>, so scale-ups stay actionable. Earlier versions estimated cost from spilled GB (0.5 s per local GB, 5 s per remote GB, 70% savings); those constants were invented and are gone.</p>
+<h4 id="clustering">Clustering<a class="headerlink" href="#clustering" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current annual cost</td>
+<td><code>select_count × avg_query_duration_s × credits_per_hour / 3600 × (365 / lookback_days) × credit_rate_usd</code></td>
+</tr>
+<tr>
+<td>Savings</td>
+<td><code>current_cost × (filter_query_count / total_queries_analyzed) × (scan_ratio - 1/distinct_values)</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>lookback_days</code> is <code>clustering_candidates_lookback_days</code> (default 7), the window <code>select_count</code> covers.</p>
+<p>The savings are weighted by two data-driven factors:
+1. <strong>Filter proportion</strong>: <code>filter_query_count / total_queries_analyzed</code> — only queries that filter on the recommended clustering key benefit from partition pruning. Both counts come from the queries the <code>extract_operator_evidence</code> hook analyzed (a sample of up to <code>clustering_key_operator_queries_per_table</code> per run), so the share is measured within that sample, not against all reads
+2. <strong>Cardinality-based scan reduction</strong>: <code>scan_ratio - 1/K</code> where K = distinct values for the clustering key — theoretical post-clustering scan ratio based on actual key cardinality</p>
+<p>This replaces the prior fixed-floor assumption (0.2) with values derived from actual query operator evidence and column cardinality profiling.</p>
+<p>Note: Clustering itself has a maintenance cost (auto-reclustering credits). We do NOT subtract this from savings because it's highly variable and depends on DML patterns. The savings estimate is gross, not net.</p>
+<h4 id="ai-spend">AI spend<a class="headerlink" href="#ai-spend" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current annual cost</td>
+<td><code>projected_annual_cost_usd</code> (already computed in fact model)</td>
+</tr>
+<tr>
+<td>Savings (model downgrade)</td>
+<td>Difference in per-token cost between current model and recommended cheaper model</td>
+</tr>
+<tr>
+<td>Savings (batch processing)</td>
+<td>Estimated 30% reduction from batch pricing (Snowflake offers batch discounts)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-effort-classification-rules">4. Effort Classification Rules<a class="headerlink" href="#4-effort-classification-rules" title="Permanent link">#</a></h2>
+<p>Each recommendation is classified into one of three effort categories:</p>
+<h3 id="config_change-quick-wins-minutes-to-apply"><code>config_change</code> — Quick wins (minutes to apply)<a class="headerlink" href="#config_change-quick-wins-minutes-to-apply" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Source Model</th>
+<th>Recommendation Pattern</th>
+<th>Actionable SQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Warehouse sizing</td>
+<td>Scale down</td>
+<td><code>ALTER WAREHOUSE &lt;name&gt; SET WAREHOUSE_SIZE = '&lt;one_size_down&gt;'</code></td>
+</tr>
+<tr>
+<td>Warehouse sizing</td>
+<td>Enable Gen2</td>
+<td><code>ALTER WAREHOUSE &lt;name&gt; SET RESOURCE_CONSTRAINT = 'STANDARD_GEN_2'</code></td>
+</tr>
+<tr>
+<td>Warehouse sizing</td>
+<td>Enable MCW</td>
+<td><code>ALTER WAREHOUSE &lt;name&gt; SET MIN_CLUSTER_COUNT = 1 MAX_CLUSTER_COUNT = &lt;n&gt;</code></td>
+</tr>
+<tr>
+<td>Materialization v2</td>
+<td>Materialize as TABLE</td>
+<td><code>{{ config(materialized='table') }}</code></td>
+</tr>
+<tr>
+<td>Incremental config</td>
+<td>Strategy recommended (with template)</td>
+<td>The <code>dbt_model_config</code> column has the ready-to-paste block</td>
+</tr>
+<tr>
+<td>Clustering candidates</td>
+<td>Add clustering key</td>
+<td><code>ALTER TABLE &lt;fqn&gt; CLUSTER BY (&lt;recommended_keys&gt;)</code></td>
+</tr>
+<tr>
+<td>AI spend</td>
+<td>Model downgrade</td>
+<td>Change model name in application code</td>
+</tr>
+<tr>
+<td>Warehouse sizing</td>
+<td>Reduce auto-suspend</td>
+<td><code>ALTER WAREHOUSE &lt;name&gt; SET AUTO_SUSPEND = 60</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="sql_refactor-needs-investigation-hours-to-days"><code>sql_refactor</code> — Needs investigation (hours to days)<a class="headerlink" href="#sql_refactor-needs-investigation-hours-to-days" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Source Model</th>
+<th>Recommendation Pattern</th>
+<th>Investigation Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Warehouse spillage</td>
+<td>Heavy spillage from query patterns</td>
+<td>Review model SQL for wide joins, missing filters, cross joins</td>
+</tr>
+<tr>
+<td>Expensive queries</td>
+<td>High credit consumption</td>
+<td>Profile the query, identify optimization opportunities</td>
+</tr>
+<tr>
+<td>AI spend</td>
+<td>Prompt bloat detected</td>
+<td>Trim prompt engineering, reduce input token count</td>
+</tr>
+</tbody>
+</table>
+<h3 id="architecture-design-work-required-days-to-weeks"><code>architecture</code> — Design work required (days to weeks)<a class="headerlink" href="#architecture-design-work-required-days-to-weeks" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Source Model</th>
+<th>Recommendation Pattern</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Incremental candidates</td>
+<td>Convert to incremental (complex)</td>
+<td>Model restructure: choose strategy, find unique keys, add filter column</td>
+</tr>
+<tr>
+<td>Materialization v2</td>
+<td>Deep view chain (4+ hops)</td>
+<td>May require DAG restructure to reduce chain depth</td>
+</tr>
+<tr>
+<td>Multiple overlapping issues</td>
+<td>Same model has 3+ recommendations</td>
+<td>Holistic redesign needed</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-cross-domain-correlations">5. Cross-Domain Correlations<a class="headerlink" href="#5-cross-domain-correlations" title="Permanent link">#</a></h2>
+<p>These are detected by joining fact models on <code>table_fqn</code> or <code>node_id</code> and looking for overlapping recommendations.</p>
+<h3 id="correlation-1-spillage-clustering-candidate">Correlation 1: Spillage + Clustering Candidate<a class="headerlink" href="#correlation-1-spillage-clustering-candidate" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> Same <code>table_fqn</code> appears in both <code>fct_warehouse_spillage_recommendations</code> AND <code>fct_table_clustering_candidates</code> (where <code>is_candidate = true</code>).</p>
+<p><strong>Root cause:</strong> Full table scans (high scan_ratio) force the query to process all micropartitions, overflowing memory and spilling to disk.</p>
+<p><strong>Recommended fix order:</strong> Cluster first. Clustering reduces scan volume, which likely eliminates the spillage without needing a warehouse scale-up.</p>
+<p><strong>Evidence:</strong> "Table has {scan_ratio}% scan ratio AND {gb_spilled} GB spillage. Clustering on {recommended_keys} would reduce both."</p>
+<hr />
+<h3 id="correlation-2-view-in-chain-downstream-spillage">Correlation 2: View in Chain + Downstream Spillage<a class="headerlink" href="#correlation-2-view-in-chain-downstream-spillage" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> Same <code>table_fqn</code> appears in <code>fct_table_materialization_candidates</code> (recommendation = 'Materialize as TABLE') AND a downstream table in <code>fct_warehouse_spillage_recommendations</code>.</p>
+<p><strong>Root cause:</strong> The view recomputes on every downstream build, creating large intermediate result sets that spill.</p>
+<p><strong>Recommended fix order:</strong> Materialize the view. Eliminates recomputation, which eliminates the intermediate result set that causes spillage.</p>
+<p><strong>Evidence:</strong> "View {model_name} is {hops} hops from downstream table that spills {gb_spilled} GB. Materializing eliminates cascading recomputation."</p>
+<hr />
+<h3 id="correlation-3-expensive-query-oversized-warehouse">Correlation 3: Expensive Query + Oversized Warehouse<a class="headerlink" href="#correlation-3-expensive-query-oversized-warehouse" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> A <code>query_hash</code> from <code>fct_expensive_query_recommendations</code> runs on a warehouse from <code>fct_warehouse_sizing_recommendations</code> where recommendation = 'Scale down'.</p>
+<p><strong>Root cause:</strong> The warehouse is oversized (queries don't need that much compute), but individual queries are still expensive (they're inefficient SQL, not undersized-warehouse problems).</p>
+<p><strong>Recommended fix order:</strong> Fix the query first. Scaling down the warehouse would make the expensive query even slower. The warehouse appears oversized because most queries are tiny, but the expensive one is masking the issue.</p>
+<p><strong>Evidence:</strong> "Warehouse {name} is oversized (median exec {sec}s) but query {hash} costs {credits} credits/month. The query needs refactoring, not the warehouse."</p>
+<hr />
+<h3 id="correlation-4-same-model-in-multiple-environments">Correlation 4: Same Model in Multiple Environments<a class="headerlink" href="#correlation-4-same-model-in-multiple-environments" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> Same <code>node_id</code> has recommendations in 2+ environments (via <code>int_snowflake__dbt_relation_history</code>).</p>
+<p><strong>Root cause:</strong> The model is inefficient regardless of environment — the problem is in the code, not the infrastructure.</p>
+<p><strong>Recommended fix order:</strong> Fix at the source (model SQL), which propagates to all environments automatically.</p>
+<p><strong>Evidence:</strong> "Model {model_name} has {recommendation} in {n} environments ({targets}). Fix the model code — all environments benefit."</p>
+<hr />
+<h3 id="correlation-5-expensive-query-incremental-candidate">Correlation 5: Expensive Query + Incremental Candidate<a class="headerlink" href="#correlation-5-expensive-query-incremental-candidate" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> A <code>dbt_node_id</code> from <code>fct_expensive_query_recommendations</code> matches a <code>dbt_model</code> in <code>fct_incremental_materialization_candidates</code>.</p>
+<p><strong>Root cause:</strong> The query is expensive because it fully rebuilds a large table every run. Converting to incremental would process only new/changed data.</p>
+<p><strong>Recommended fix order:</strong> Convert to incremental. This addresses both the expensive query cost (smaller working set per run) and the materialization inefficiency.</p>
+<p><strong>Evidence:</strong> "Query for model {model_name} costs {credits}/month and rebuilds {table_size_gb} GB with {rebuild_redundancy_rate}% redundancy. Incremental would process only delta."</p>
+<hr />
+<h3 id="correlation-6-spillage-incremental-candidate">Correlation 6: Spillage + Incremental Candidate<a class="headerlink" href="#correlation-6-spillage-incremental-candidate" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> Same <code>table_fqn</code> appears in both <code>fct_warehouse_spillage_recommendations</code> AND <code>fct_incremental_materialization_candidates</code>.</p>
+<p><strong>Root cause:</strong> Full table rebuilds process the entire dataset, overflowing memory. Incremental would reduce the working set size.</p>
+<p><strong>Recommended fix order:</strong> Convert to incremental. Smaller working set per run means less memory pressure, likely eliminating spillage.</p>
+<p><strong>Evidence:</strong> "Table {table_fqn} spills {gb_spilled} GB during builds AND has {rebuild_redundancy_rate}% rebuild redundancy. Incremental would reduce working set and eliminate spillage."</p>
+<hr />
+<h3 id="correlation-7-high-ai-spend-user-concentration">Correlation 7: High AI Spend + User Concentration<a class="headerlink" href="#correlation-7-high-ai-spend-user-concentration" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> <code>fct_ai_spend_overview</code> shows high total_credits AND <code>fct_ai_user_spend_recommendations</code> identifies a single user with &gt;50% of spend.</p>
+<p><strong>Root cause:</strong> AI costs aren't systemic — one user/workflow is driving the majority of consumption.</p>
+<p><strong>Recommended fix order:</strong> Address the concentrated user's patterns (rate limit, model downgrade for their use case, or optimize their prompts).</p>
+<p><strong>Evidence:</strong> "AI spend is {credits}/month. User {user_name} accounts for {pct}% of total. Optimizing their usage alone would save {savings}/year."</p>
+<hr />
+<h3 id="correlation-8-materialization-candidate-expensive-downstream-query">Correlation 8: Materialization Candidate + Expensive Downstream Query<a class="headerlink" href="#correlation-8-materialization-candidate-expensive-downstream-query" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> A <code>table_fqn</code> in <code>fct_table_materialization_candidates</code> has a downstream table whose build queries appear in <code>fct_expensive_query_recommendations</code>.</p>
+<p><strong>Root cause:</strong> An expensive downstream query is expensive partly because it recomputes an upstream view every time it runs.</p>
+<p><strong>Recommended fix order:</strong> Materialize the upstream view. The downstream query's cost drops because it reads a pre-computed table instead of triggering cascading view expansion.</p>
+<p><strong>Evidence:</strong> "View {model_name} is referenced by expensive query {hash} (${cost}/year). Materializing eliminates {select_count} recomputations/period."</p>
+<hr />
+<h3 id="correlation-9-clustering-candidate-expensive-query">Correlation 9: Clustering Candidate + Expensive Query<a class="headerlink" href="#correlation-9-clustering-candidate-expensive-query" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> A <code>table_fqn</code> in <code>fct_table_clustering_candidates</code> (with high scan_ratio) also has queries in <code>fct_expensive_query_recommendations</code>.</p>
+<p><strong>Root cause:</strong> Queries are expensive because they scan the full table (no pruning). Clustering would allow partition pruning.</p>
+<p><strong>Recommended fix order:</strong> Add clustering key. Reduces scan cost for all queries against this table, including the expensive ones.</p>
+<p><strong>Evidence:</strong> "Table {table_fqn} has {scan_ratio}% scan ratio and expensive queries costing {credits}/month. Clustering on {keys} would reduce scan volume and query cost."</p>
+<hr />
+<h3 id="correlation-10-oversized-warehouse-low-query-volume">Correlation 10: Oversized Warehouse + Low Query Volume<a class="headerlink" href="#correlation-10-oversized-warehouse-low-query-volume" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> <code>fct_warehouse_sizing_recommendations</code> shows 'Scale down' AND <code>total_queries_30d</code> is below a threshold (e.g., &lt; 1000) AND <code>avg_idle_credit_pct &gt; 30%</code>.</p>
+<p><strong>Root cause:</strong> The warehouse isn't just oversized — it's barely used but stays running (high idle credits). Auto-suspend tuning is needed alongside sizing.</p>
+<p><strong>Recommended fix order:</strong> Reduce auto-suspend timeout first (immediate credit reduction), then evaluate sizing.</p>
+<p><strong>Evidence:</strong> "Warehouse {name} has {queries} queries/month with {idle_pct}% idle credits ({idle_credits} wasted). Reduce auto-suspend from current to 60s, then evaluate sizing."</p>
+<hr />
+<h3 id="correlation-11-incremental-materialization-in-same-lineage">Correlation 11: Incremental + Materialization in Same Lineage<a class="headerlink" href="#correlation-11-incremental-materialization-in-same-lineage" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> A <code>table_fqn</code> in <code>fct_table_materialization_candidates</code> is upstream (in <code>int_dbt__relations.parent_models</code>) of a <code>table_fqn</code> in <code>fct_incremental_materialization_candidates</code>.</p>
+<p><strong>Root cause:</strong> A view feeds into a table that should be incremental. Both changes together compound: materializing the view reduces the incremental model's scan cost, and making it incremental reduces redundant rebuilds.</p>
+<p><strong>Recommended fix order:</strong> Materialize the view first (quick config change), then convert the downstream to incremental (architecture work).</p>
+<p><strong>Evidence:</strong> "View {view_model} feeds table {table_model}. Materializing the view AND converting to incremental would compound savings: eliminated recomputation + eliminated redundant rebuilds."</p>
+<hr />
+<h3 id="correlation-12-package-self-referential-spillage">Correlation 12: Package Self-Referential Spillage<a class="headerlink" href="#correlation-12-package-self-referential-spillage" title="Permanent link">#</a></h3>
+<p><strong>Detection:</strong> <code>fct_warehouse_spillage_recommendations</code> contains rows where <code>package_name = 'dbt_cost_optimization'</code>.</p>
+<p><strong>Root cause:</strong> The optimization package's own models are spilling because they query large ACCOUNT_USAGE views. This is a "heal thyself" signal.</p>
+<p><strong>Recommended fix order:</strong> Scale up the build warehouse for package model runs, or increase the warehouse's auto-suspend timeout to avoid cold starts.</p>
+<p><strong>Evidence:</strong> "Package model {model_name} spills {gb_spilled} GB on warehouse {warehouse_name}. Consider using a larger warehouse for the cost optimization job, or materializing upstream intermediates."</p>
+<hr />
+<h2 id="6-environment-handling">6. Environment Handling<a class="headerlink" href="#6-environment-handling" title="Permanent link">#</a></h2>
+<h3 id="how-deduplication-works">How deduplication works<a class="headerlink" href="#how-deduplication-works" title="Permanent link">#</a></h3>
+<p>When multiple environments have the same recommendation for the same logical model, the gold layer picks the <strong>highest-impact</strong> environment (most savings/score) regardless of environment label. This avoids guessing which environment is "production" — the most expensive instance is always the most actionable.</p>
+<h3 id="environment-identifiers">Environment identifiers<a class="headerlink" href="#environment-identifiers" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Source</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dbt_cloud_environment_id</code></td>
+<td>Query comment JSON</td>
+<td>Unique per dbt platform environment. Not present on dbt platform Studio (development) builds or outside dbt platform.</td>
+</tr>
+<tr>
+<td><code>target_name</code></td>
+<td>Query comment JSON</td>
+<td>Human-readable but unreliable: often "default" in dbt platform, and one Studio session can record both "default" and "dev".</td>
+</tr>
+<tr>
+<td><code>deployed_relation_count</code></td>
+<td>Derived</td>
+<td>Number of deployments of the model: distinct physical tables it has been built into (e.g. a dev schema, a prod schema, and dbt Cloud CI schemas), excluding <code>dbt_excluded_schemas</code> / <code>dbt_excluded_targets</code>. Set <code>dbt_excluded_schemas: ['DBT_CLOUD_PR_%']</code> to leave CI schemas out.</td>
+</tr>
+<tr>
+<td><code>environment_ids</code></td>
+<td>Derived</td>
+<td>Array of all <code>dbt_cloud_environment_id</code> values for this model.</td>
+</tr>
+</tbody>
+</table>
+<p><code>int_snowflake__dbt_relation_history</code> has <strong>one row per physical table</strong>. A table built under several target names is one deployment: <code>target_name</code> is the latest build's target, and <code>target_names</code> and <code>dbt_cloud_environment_ids</code> list every one seen. Keeping one row per table keeps joins on the table name one-to-one, so recommendations aren't multiplied.</p>
+<h3 id="leaving-out-dev-deployments">Leaving out dev deployments<a class="headerlink" href="#leaving-out-dev-deployments" title="Permanent link">#</a></h3>
+<p>Many teams never clean up dev schemas, and seeing those costs can be useful, so by default nothing is excluded. Two variables leave dev deployments out of the recommendation backlog, the gold views and <code>deployed_relation_count</code>:</p>
+<p><strong><code>dbt_excluded_schemas</code></strong> (default <code>[]</code>): schema name patterns (<code>LIKE</code>, case-insensitive), e.g. <code>['DBT_%']</code> for personal dev schemas. Usually the most reliable option, since target names don't always separate dev from prod.</p>
+<p><strong><code>dbt_excluded_targets</code></strong> (default <code>[]</code>): target names, e.g. <code>['dev']</code>. A table is left out only when every target it was built under is excluded. A table built under both <code>dev</code> and <code>prod</code> stays.</p>
+<p>Warehouse-level recommendations have no table, so they aren't affected.</p>
+<h3 id="project-scoping">Project scoping<a class="headerlink" href="#project-scoping" title="Permanent link">#</a></h3>
+<p>Two variables control what the gold layer surfaces:</p>
+<p><strong><code>dbt_monitored_projects</code></strong> (default: <code>[]</code> → resolves to current project):
+- <code>[]</code> — only the project where the package is installed
+- <code>['project_a', 'project_b']</code> — specific projects (mesh/multi-project)
+- <code>['*']</code> — all dbt projects visible in the Snowflake account's QUERY_HISTORY</p>
+<p><strong><code>include_full_platform_insights</code></strong> (default: <code>false</code>):
+- <code>false</code> — only entities connected to dbt queries from monitored projects
+- <code>true</code> — include account-wide signals: all warehouses (even those no dbt project uses), CoCo/Intelligence spend, all users regardless of dbt involvement</p>
+<p>The scope filter is applied once in <code>int_snowflake__all_recommendations</code> via the <code>scope_filter()</code> macro. All gold views inherit this filtering.</p>
+<p>Warehouse-level config recommendations (idle credits, overload, etc.) have no direct model association. These are mapped to projects via the <code>wh_project</code> CTE in <code>int_snowflake__all_recommendations</code>, which identifies which project's models run on each warehouse by parsing dbt query comments. This means warehouse config recs automatically appear for any warehouse used by the monitored project(s).</p>
+<p>AI services and other account-wide signals with no warehouse or project association only appear when <code>include_full_platform_insights = true</code>.</p>
+<h3 id="cross-environment-monitoring">Cross-environment monitoring<a class="headerlink" href="#cross-environment-monitoring" title="Permanent link">#</a></h3>
+<p>The package monitors all models visible in <code>QUERY_HISTORY</code> within the current Snowflake account. A single deploy can observe models from all environments (dev, staging, prod) as long as they share the same Snowflake account.</p>
+<p><strong>Limitation:</strong> For multi-account architectures (environments split across Snowflake accounts), deploy the package in each account independently. <code>QUERY_HISTORY</code> is account-scoped.</p>
+<hr />
+<h2 id="7-limitations-and-assumptions">7. Limitations and Assumptions<a class="headerlink" href="#7-limitations-and-assumptions" title="Permanent link">#</a></h2>
+<h3 id="cost-estimation-accuracy">Cost estimation accuracy<a class="headerlink" href="#cost-estimation-accuracy" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Accuracy</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Warehouse sizing (idle credits)</td>
+<td>High</td>
+<td>Directly measured from metering</td>
+</tr>
+<tr>
+<td>Expensive queries</td>
+<td>High</td>
+<td>QUERY_ATTRIBUTION_HISTORY provides exact per-query credits</td>
+</tr>
+<tr>
+<td>Materialization</td>
+<td>Medium</td>
+<td>Assumes constant query volume; doesn't account for caching</td>
+</tr>
+<tr>
+<td>Clustering</td>
+<td>Medium</td>
+<td>Uses cardinality-based scan reduction weighted by filter proportion; actual improvement depends on query patterns</td>
+</tr>
+<tr>
+<td>Spillage</td>
+<td>Low</td>
+<td>Overhead-per-GB is estimated; actual impact varies by data types and operations</td>
+</tr>
+<tr>
+<td>AI spend (model downgrade)</td>
+<td>Medium</td>
+<td>Assumes same quality of output from cheaper model</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-we-cannot-estimate">What we cannot estimate<a class="headerlink" href="#what-we-cannot-estimate" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Net savings after clustering maintenance cost</strong> — reclustering credits depend on DML volume, which varies</li>
+<li><strong>Caching effects</strong> — Snowflake's result cache may already reduce view recomputation; materializing may save less than projected</li>
+<li><strong>Concurrency impact</strong> — scaling down a warehouse may increase queue time for concurrent queries</li>
+<li><strong>Quality impact of AI model downgrades</strong> — cheaper models may produce worse results</li>
+</ul>
+<h3 id="assumptions">Assumptions<a class="headerlink" href="#assumptions" title="Permanent link">#</a></h3>
+<ul>
+<li><code>credit_rate_usd</code> is uniform across all services (may not be true for some contract types)</li>
+<li>Query patterns over the lookback window are representative of future patterns</li>
+<li>All recommendations are independent (in practice, fixing one may eliminate another)</li>
+<li>Cross-domain savings are NOT double-counted — the <code>combined_estimated_savings</code> in cross-domain insights represents the expected savings from addressing the root cause, not the sum of both domains</li>
+</ul>
+<h3 id="minimum-savings-threshold">Minimum savings threshold<a class="headerlink" href="#minimum-savings-threshold" title="Permanent link">#</a></h3>
+<p>Recommendations with <code>estimated_annual_savings_usd</code> below <code>min_annual_savings_usd</code> (default: $1) are downgraded to <code>backlog_status = 'stable'</code> in <code>int_snowflake__all_recommendations</code>. This filters noise (e.g., a view chain recommendation saving $0.0002/year) from all gold views without deleting the data. The threshold is configurable — organizations with higher spend may want to raise it to $10 or $100 to focus on material opportunities.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../macros/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Quick-use commands">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Quick-use commands
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../warehouse_recommendations/" class="md-footer__link md-footer__link--next" aria-label="Next: Warehouses">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Warehouses
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.footer", "navigation.instant", "navigation.tracking", "content.action.edit", "content.code.copy", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
