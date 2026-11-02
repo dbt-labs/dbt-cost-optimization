@@ -1,0 +1,2272 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Find cost optimization opportunities in your dbt project on Snowflake, Databricks, BigQuery and Redshift.">
+      
+      
+      
+        <link rel="canonical" href="https://dbt-labs.github.io/dbt-cost-optimization/1.0/databricks/liquid_clustering_candidates/">
+      
+      
+        <link rel="prev" href="../incremental_model_candidates/">
+      
+      
+        <link rel="next" href="../optimize_candidates/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Liquid clustering candidates - dbt Cost Optimization Package</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#liquid-clustering-candidates" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="dbt Cost Optimization Package" class="md-header__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dbt Cost Optimization Package
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Liquid clustering candidates
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="dbt Cost Optimization Package" class="md-nav__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    dbt Cost Optimization Package
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Snowflake
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick-use commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recommendations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recommendations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/gold_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/warehouse_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table materialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/table_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/ai_cortex_spend_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/optimization_priorities_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization priorities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/warehouse_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/incremental_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/future_optimizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_model_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipeline Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pipeline Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#staging-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staging layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intermediate-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intermediate layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fact model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-liquid-clustering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Liquid Clustering?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimize-candidates-vs-liquid-clustering-candidates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimize Candidates vs. Liquid Clustering Candidates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optimize Candidates vs. Liquid Clustering Candidates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-a-table-appears-in-both" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When a table appears in both
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-a-table-appears-in-only-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When a table appears in only one
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-stats-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query stats scope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact-model-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fact model tuning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Columns
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-is_candidate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding is_candidate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding is_candidate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-is_candidate-is-false-but-the-data-is-still-useful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When is_candidate is false but the data is still useful
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-suggested_cluster_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding suggested_cluster_key
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding suggested_cluster_key">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-databricks-suggestions-are-approximate-vs-snowflake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Databricks suggestions are approximate (vs. Snowflake)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confidence-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confidence levels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applying-the-suggestion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Applying the suggestion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sample Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#top-candidates-by-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top candidates by score
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fragmented-tables-with-high-query-activity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fragmented tables with high query activity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#historical-trend-for-a-specific-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historical trend for a specific table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimize_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPTIMIZE candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model_run_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model run summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigQuery (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bigquery/clustering_key_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clustering key candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redshift (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Redshift (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../redshift/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../redshift/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../redshift/materialization-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/dbt-labs/dbt-cost-optimization/edit/main/docs/databricks/liquid_clustering_candidates.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="liquid-clustering-candidates">Liquid Clustering Candidates<a class="headerlink" href="#liquid-clustering-candidates" title="Permanent link">#</a></h1>
+<p>This document covers the end-to-end pipeline for identifying Databricks Delta tables that may benefit from Liquid Clustering, from staging through the fact model, with emphasis on configuration and how to interpret the results.</p>
+<h2 id="pipeline-overview">Pipeline Overview<a class="headerlink" href="#pipeline-overview" title="Permanent link">#</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Staging                              Intermediate                               Mart
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>───────                              ────────────                               ────
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>stg_databricks__tables           ─┐
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                                   ├──► int_databricks__tables        ─┐
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>stg_databricks__table_info       ─┘                                    │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  (system.storage.                ──► int_databricks__table_storage  ──├──► int_databricks__table_inventory ─┐
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>   table_metrics_history)                                              ─┘                                     │
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                                                                                              ├──► fct_databricks__liquid_
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>stg_databricks__query_history    ──► int_databricks__query_history    ─┐                                      │      clustering_candidates
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>  (system.query.history)                                               ├──► int_databricks__table_query_  ───┘
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                                                                       │      stats_daily
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                                  int_dbt__relations                  ─┘
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                                  int_dbt__relations                  ──────────────────────────────────────────┘
+</span></code></pre></div>
+<h3 id="staging-layer">Staging layer<a class="headerlink" href="#staging-layer" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Source</th>
+<th>Materialization</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stg_databricks__tables</code></td>
+<td><code>system.information_schema.tables</code></td>
+<td>view</td>
+</tr>
+<tr>
+<td><code>stg_databricks__table_info</code></td>
+<td><code>system.storage.table_metrics_history</code></td>
+<td>view (latest snapshot per table)</td>
+</tr>
+<tr>
+<td><code>stg_databricks__query_history</code></td>
+<td><code>system.query.history</code></td>
+<td>incremental (7-day lookback)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> <code>system.storage.table_metrics_history</code> is a daily snapshot table populated by Databricks once per day. It must be enabled by an account admin before data appears. See <a href="https://docs.databricks.com/en/admin/system-tables/index.html">Databricks system tables documentation</a>.</p>
+<h3 id="intermediate-layer">Intermediate layer<a class="headerlink" href="#intermediate-layer" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int_databricks__tables</code></td>
+<td>Normalizes table metadata from <code>table_metrics_history</code>. Maps Unity Catalog table types to standard types and extracts partition columns as a clustering key proxy.</td>
+</tr>
+<tr>
+<td><code>int_databricks__table_storage</code></td>
+<td>Extracts storage metrics per table: active bytes, file count. Time travel and failsafe bytes are not applicable for Databricks and are nulled out.</td>
+</tr>
+<tr>
+<td><code>int_databricks__table_inventory</code></td>
+<td>Joins table metadata with storage metrics. Produces one row per active, non-deleted table with size, file count, and clustering state.</td>
+</tr>
+<tr>
+<td><code>int_databricks__table_query_stats_daily</code></td>
+<td>Daily aggregated query statistics per table. Attribution uses <code>statement_text</code> matching — joins query text against table names to count reads and writes per table per day.</td>
+</tr>
+<tr>
+<td><code>int_dbt__relations</code></td>
+<td>Compile-time mapping from dbt model metadata to physical relation names. Used to attribute results back to dbt models.</td>
+</tr>
+</tbody>
+</table>
+<p>Platform-agnostic routers (<code>int_table_inventory</code>, <code>int_table_query_stats_daily</code>) sit between the platform-specific intermediate models and the fact. The fact references these routers, not the Databricks-specific models directly.</p>
+<h3 id="fact-model">Fact model<a class="headerlink" href="#fact-model" title="Permanent link">#</a></h3>
+<p><strong><code>fct_databricks__liquid_clustering_candidates</code></strong> is the final output. It is an incremental model (merge strategy, one snapshot per day) that scores Delta tables and flags Liquid Clustering candidates based on query activity, table size, and file fragmentation.</p>
+<hr />
+<h2 id="what-is-liquid-clustering">What is Liquid Clustering?<a class="headerlink" href="#what-is-liquid-clustering" title="Permanent link">#</a></h2>
+<p>Liquid Clustering is Delta Lake's adaptive data layout feature. Instead of requiring you to define partition columns upfront, it continuously reorganizes table files to cluster data by the most-queried columns. This reduces the number of files Databricks must open per query (file pruning), which directly lowers bytes scanned and compute cost.</p>
+<p>A fragmented table — one with many small files — forces Databricks to open and partially read hundreds of files to return results. A well-clustered table with fewer, larger files reduces that to a handful.</p>
+<p>Liquid Clustering replaces both traditional Hive-style partitioning and manual <code>ZORDER</code> for most use cases. It is maintained by running <code>OPTIMIZE</code> on the table, which Databricks can also do automatically via Predictive Optimization.</p>
+<hr />
+<h2 id="optimize-candidates-vs-liquid-clustering-candidates">Optimize Candidates vs. Liquid Clustering Candidates<a class="headerlink" href="#optimize-candidates-vs-liquid-clustering-candidates" title="Permanent link">#</a></h2>
+<p>Both models identify fragmented Delta tables, but they answer different questions and recommend different actions.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>fct_databricks__optimize_candidates</code></th>
+<th><code>fct_databricks__liquid_clustering_candidates</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Question it answers</strong></td>
+<td>"Which fragmented tables need compacting now?"</td>
+<td>"Which heavily-queried tables would scan fewer files with liquid clustering?"</td>
+</tr>
+<tr>
+<td><strong>Signal used</strong></td>
+<td>Storage only (file count, avg file size)</td>
+<td>Storage + query history (reads vs. writes)</td>
+</tr>
+<tr>
+<td><strong>Action recommended</strong></td>
+<td>Run <code>OPTIMIZE</code> or enable Predictive Optimization</td>
+<td>Add <code>CLUSTER BY</code> columns to the table</td>
+</tr>
+<tr>
+<td><strong>Effect</strong></td>
+<td>Compacts existing small files into larger ones</td>
+<td>Reorganizes data layout so future queries skip more files</td>
+</tr>
+<tr>
+<td><strong>PO interaction</strong></td>
+<td>Tables with PO already enabled are excluded (<code>is_candidate = false</code>)</td>
+<td>PO status is not checked — liquid clustering is complementary to PO</td>
+</tr>
+<tr>
+<td><strong>Type of change</strong></td>
+<td>Maintenance (periodic or automatic)</td>
+<td>Architectural (one-time schema change)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="when-a-table-appears-in-both">When a table appears in both<a class="headerlink" href="#when-a-table-appears-in-both" title="Permanent link">#</a></h3>
+<p>A large, read-heavy, fragmented table with Predictive Optimization disabled will show up in both models. The recommended sequence is:</p>
+<ol>
+<li><strong>Short-term:</strong> Run <code>OPTIMIZE</code> to compact existing files and improve query performance immediately.</li>
+<li><strong>Medium-term:</strong> Enable Predictive Optimization so Databricks handles compaction automatically going forward.</li>
+<li><strong>Longer-term:</strong> Evaluate Liquid Clustering if the table has clear high-cardinality filter columns — clustering will further reduce files scanned per query beyond what compaction alone achieves.</li>
+</ol>
+<h3 id="when-a-table-appears-in-only-one">When a table appears in only one<a class="headerlink" href="#when-a-table-appears-in-only-one" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Optimize only:</strong> The table is fragmented but not actively queried (no SELECT history), or has more DML than SELECTs. Compaction is still worth doing to keep storage efficient.</li>
+<li><strong>Liquid clustering only:</strong> The table already has well-sized files (above the fragmentation threshold) but is very query-heavy and large. The benefit here comes from data layout, not file count.</li>
+</ul>
+<hr />
+<h2 id="project-variables">Project Variables<a class="headerlink" href="#project-variables" title="Permanent link">#</a></h2>
+<p>Set these in your project's <code>dbt_project.yml</code> <code>vars:</code> section (or with <code>--vars</code>) to customize behavior.</p>
+<h3 id="query-stats-scope">Query stats scope<a class="headerlink" href="#query-stats-scope" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table_query_stats_full_account</code></td>
+<td><code>false</code></td>
+<td>When <code>false</code> (default), only collects query stats for tables that are dbt models in the current project. Set to <code>true</code> to scan query history against all tables in the inventory.</td>
+</tr>
+<tr>
+<td><code>table_query_stats_initial_lookback_days</code></td>
+<td><code>7</code></td>
+<td>Number of days of query history to process on the first build. Subsequent incremental runs pick up from the last processed date.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fact-model-tuning">Fact model tuning<a class="headerlink" href="#fact-model-tuning" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cluster_key_suggestion_lookback_days</code></td>
+<td><code>30</code></td>
+<td>Number of days of query history to scan when scoring column suggestions. A longer window gives more signal but increases compute.</td>
+</tr>
+<tr>
+<td><code>liquid_clustering_candidates_min_size_gb</code></td>
+<td><code>1</code></td>
+<td>Minimum table size in GB to evaluate. Only tables at or above this threshold appear in results.</td>
+</tr>
+<tr>
+<td><code>liquid_clustering_candidates_lookback_days</code></td>
+<td><code>7</code></td>
+<td>Number of days of daily query stats to aggregate when computing scores and metrics.</td>
+</tr>
+<tr>
+<td><code>liquid_clustering_candidates_dbt_project_only</code></td>
+<td><code>true</code></td>
+<td>When <code>true</code>, only tables that match a dbt model in the current project are included in the output. Set to <code>false</code> to include all tables that meet the size threshold.</td>
+</tr>
+<tr>
+<td><code>liquid_clustering_candidates_target_databases</code></td>
+<td><code>[]</code></td>
+<td>Optional list of catalog names to restrict evaluation to. Empty = no restriction.</td>
+</tr>
+<tr>
+<td><code>liquid_clustering_candidates_target_schemas</code></td>
+<td><code>[]</code></td>
+<td>Optional list of schema names to restrict evaluation to. Empty = no restriction.</td>
+</tr>
+<tr>
+<td><code>liquid_clustering_candidates_max_avg_file_size_mb</code></td>
+<td><code>128</code></td>
+<td>Tables with an average file size above this threshold are considered well-compacted and deprioritized. Default 128 MB is the Delta Lake recommended target file size.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example configuration<a class="headerlink" href="#example-configuration" title="Permanent link">#</a></h3>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># dbt_project.yml</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">vars</span><span class="p">:</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="c1"># Lower threshold for dev/sandbox environments</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">liquid_clustering_candidates_min_size_gb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="c1"># Widen the analysis window</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">liquid_clustering_candidates_lookback_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">14</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="c1"># Include all tables, not just dbt models</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="nt">liquid_clustering_candidates_dbt_project_only</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span></code></pre></div>
+<hr />
+<h2 id="output-columns">Output Columns<a class="headerlink" href="#output-columns" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>analyzed_at</code></td>
+<td>Timestamp when the snapshot was computed</td>
+</tr>
+<tr>
+<td><code>snapshot_date</code></td>
+<td>Date of the snapshot (one per day)</td>
+</tr>
+<tr>
+<td><code>database_name</code></td>
+<td>Catalog containing the table</td>
+</tr>
+<tr>
+<td><code>schema_name</code></td>
+<td>Schema containing the table</td>
+</tr>
+<tr>
+<td><code>table_name</code></td>
+<td>Table name</td>
+</tr>
+<tr>
+<td><code>table_fqn</code></td>
+<td>Fully qualified name (<code>catalog.schema.table</code>)</td>
+</tr>
+<tr>
+<td><code>dbt_model</code></td>
+<td>dbt <code>unique_id</code> if the table is a dbt model, otherwise <code>null</code></td>
+</tr>
+<tr>
+<td><code>table_type</code></td>
+<td>Managed Table or External Table</td>
+</tr>
+<tr>
+<td><code>score</code></td>
+<td>Composite score combining query volume, execution time, read/write ratio, and file fragmentation. Higher = more potential benefit from clustering.</td>
+</tr>
+<tr>
+<td><code>is_candidate</code></td>
+<td>Whether the table meets all criteria for Liquid Clustering (see below)</td>
+</tr>
+<tr>
+<td><code>table_size_gb</code></td>
+<td>Table size in GB (active bytes only, excludes time travel and failsafe)</td>
+</tr>
+<tr>
+<td><code>total_rows</code></td>
+<td>Row count (null — not available from <code>table_metrics_history</code>; join to <code>information_schema</code> if needed)</td>
+</tr>
+<tr>
+<td><code>current_file_count</code></td>
+<td>Number of active Delta files in the table</td>
+</tr>
+<tr>
+<td><code>avg_file_size_mb</code></td>
+<td>Average file size in MB (<code>active_bytes / file_count / 1024^2</code>)</td>
+</tr>
+<tr>
+<td><code>is_already_clustered</code></td>
+<td>Whether the table already has a clustering key or partition column defined</td>
+</tr>
+<tr>
+<td><code>avg_files_scanned</code></td>
+<td>Average number of files scanned per SELECT query in the lookback window</td>
+</tr>
+<tr>
+<td><code>select_count</code></td>
+<td>Number of SELECT queries against the table in the lookback window</td>
+</tr>
+<tr>
+<td><code>dml_count</code></td>
+<td>Number of INSERT/UPDATE/DELETE/MERGE operations in the lookback window</td>
+</tr>
+<tr>
+<td><code>query_to_dml_ratio</code></td>
+<td><code>select_count / (dml_count + 1)</code> — higher means more read-heavy</td>
+</tr>
+<tr>
+<td><code>avg_query_duration_s</code></td>
+<td>Average SELECT execution time in seconds</td>
+</tr>
+<tr>
+<td><code>suggested_cluster_key</code></td>
+<td>Best-guess column to use as the <code>CLUSTER BY</code> key (see below)</td>
+</tr>
+<tr>
+<td><code>suggested_cluster_key_confidence</code></td>
+<td><code>HIGH</code>, <code>MEDIUM</code>, <code>LOW</code>, or <code>HEURISTIC</code> — how confident the suggestion is</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="understanding-is_candidate">Understanding <code>is_candidate</code><a class="headerlink" href="#understanding-is_candidate" title="Permanent link">#</a></h2>
+<p>A table is flagged as <code>is_candidate = true</code> only when <strong>all four</strong> conditions are met:</p>
+<ol>
+<li>
+<p><strong>The table is actively read.</strong> <code>select_count &gt; 0</code> — at least one SELECT query was executed against the table during the lookback window.</p>
+</li>
+<li>
+<p><strong>Reads outnumber writes.</strong> <code>query_to_dml_ratio &gt; 1</code> — the table receives more SELECT queries than DML operations. Liquid Clustering reorganizes files during <code>OPTIMIZE</code>, but every write introduces new small files that undo that organization. Tables with constant heavy writes will require frequent OPTIMIZE runs, increasing compute cost.</p>
+</li>
+<li>
+<p><strong>The table meets the minimum size threshold.</strong> <code>table_size_gb &gt;= liquid_clustering_candidates_min_size_gb</code> — clustering overhead is not justified for small tables. Default is 1 GB.</p>
+</li>
+<li>
+<p><strong>The table is fragmented.</strong> <code>avg_file_size_mb &lt; liquid_clustering_candidates_max_avg_file_size_mb</code> — a table with large, well-sized files is already efficiently laid out. Default threshold is 128 MB (Delta Lake's recommended target).</p>
+</li>
+</ol>
+<h3 id="when-is_candidate-is-false-but-the-data-is-still-useful">When <code>is_candidate</code> is <code>false</code> but the data is still useful<a class="headerlink" href="#when-is_candidate-is-false-but-the-data-is-still-useful" title="Permanent link">#</a></h3>
+<p>A table may have a <strong>high score</strong> but <code>is_candidate = false</code>. Score and is_candidate measure different things:</p>
+<ul>
+<li><strong>Score</strong> = "How much query activity and file fragmentation exists?" — a raw signal of potential benefit.</li>
+<li><strong>is_candidate</strong> = "Is clustering practically viable given the read/write mix, size, and current file layout?"</li>
+</ul>
+<p>A table that writes frequently but has very high query volume may still benefit from Liquid Clustering with Predictive Optimization enabled, which handles the OPTIMIZE cadence automatically.</p>
+<hr />
+<h2 id="understanding-suggested_cluster_key">Understanding <code>suggested_cluster_key</code><a class="headerlink" href="#understanding-suggested_cluster_key" title="Permanent link">#</a></h2>
+<p>The <code>suggested_cluster_key</code> column provides a best-guess column name to use when running <code>ALTER TABLE ... CLUSTER BY</code>. It is generated by <code>int_databricks__column_cluster_suggestions</code>, which scores every column in the table using two signals:</p>
+<h3 id="why-databricks-suggestions-are-approximate-vs-snowflake">Why Databricks suggestions are approximate (vs. Snowflake)<a class="headerlink" href="#why-databricks-suggestions-are-approximate-vs-snowflake" title="Permanent link">#</a></h3>
+<p>On Snowflake, this package can identify the exact columns that were accessed in each query using <code>ACCESS_HISTORY</code> — a system table that records every column touched by every query, tagged as a filter, a projection, or a join condition. This means the Snowflake equivalent of this feature can tell you with certainty: "this column was used as a filter in 87 of the last 100 queries against this table."</p>
+<p><strong>Databricks does not have an equivalent of <code>ACCESS_HISTORY</code>.</strong> The closest system table is <code>system.query.history</code>, which records the raw SQL text of each query but does not parse or attribute column access. There is no native way to know which columns were in a <code>WHERE</code> clause vs. a <code>SELECT</code> list vs. a <code>JOIN</code> condition.</p>
+<p>To work around this, <code>int_databricks__column_cluster_suggestions</code> uses <strong>text matching</strong>: it checks whether a column name appears anywhere in the query text (<code>ilike '%column_name%'</code>). If <code>created_at</code> appears in 80% of the SELECT queries that touch your table, it is likely being filtered on — but the model cannot be certain. It is co-occurrence, not attribution.</p>
+<p>This means:
+- The suggestion is a <strong>starting point</strong>, not a definitive answer.
+- Confidence levels (<code>HIGH</code>, <code>MEDIUM</code>, <code>LOW</code>) reflect how often a column co-occurs in query text — not how often it is actually filtered on.
+- The <strong><code>HEURISTIC</code></strong> confidence level is the fallback when no query history exists at all, using only data type and column name patterns.</p>
+<p>Always validate the suggestion against your actual query patterns before applying <code>CLUSTER BY</code>.</p>
+<hr />
+<p><strong>1. Query frequency (primary signal)</strong>
+The model scans query history for SELECT queries that mention the table (via <code>statement_text</code> matching) and counts how often each column name also appears in those queries. Columns that show up in many queries are more likely to be filter predicates and therefore good clustering candidates.</p>
+<p><strong>2. Data type and name heuristics (fallback signal)</strong>
+When query history is unavailable or sparse, the model falls back to:
+- <strong>Data type:</strong> <code>DATE</code> and <code>TIMESTAMP</code> columns receive a score boost — date-range filters are by far the most common clustering use case in Delta Lake.
+- <strong>Column name patterns:</strong> names containing words like <code>date</code>, <code>_at</code>, <code>region</code>, <code>status</code>, <code>type</code>, <code>category</code> receive a smaller boost, as these are common filter column naming conventions.</p>
+<h3 id="confidence-levels">Confidence levels<a class="headerlink" href="#confidence-levels" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HIGH</code></td>
+<td>Column appears in ≥ 50% of recent queries against this table</td>
+</tr>
+<tr>
+<td><code>MEDIUM</code></td>
+<td>Column appears in 20–49% of recent queries</td>
+</tr>
+<tr>
+<td><code>LOW</code></td>
+<td>Column appears in &lt; 20% of recent queries, but still scored above alternatives</td>
+</tr>
+<tr>
+<td><code>HEURISTIC</code></td>
+<td>No query history exists for this table — suggestion is based on data type and column name only</td>
+</tr>
+<tr>
+<td><code>null</code></td>
+<td>No suggestion could be made (table has no columns that scored above zero)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">#</a></h3>
+<p>These limitations follow directly from Databricks's lack of column-level access attribution (see above):</p>
+<ul>
+<li><strong>Substring matching:</strong> column names are matched against full query text using <code>ilike '%column_name%'</code>, so a column named <code>user_id</code> will also match queries mentioning <code>session_user_id</code>. Short or generic column names (under 4 characters) are excluded from scoring to reduce false positives, but some noise remains.</li>
+<li><strong>No WHERE clause parsing:</strong> the model cannot distinguish a column used in a filter from one used in a SELECT list or JOIN condition. It uses co-occurrence in the query text as a proxy.</li>
+<li><strong>Redacted query text:</strong> if your workspace uses customer-managed keys, <code>statement_text</code> is empty and the suggestion will fall back to <code>HEURISTIC</code> for all tables. This is a known Databricks limitation — the raw query text is the only available attribution signal, so redaction eliminates it entirely.</li>
+<li><strong>Treat as a starting point:</strong> always validate the suggestion against your actual query patterns before applying <code>CLUSTER BY</code>. The model points you in the right direction; it doesn't replace engineering judgment.</li>
+</ul>
+<h3 id="applying-the-suggestion">Applying the suggestion<a class="headerlink" href="#applying-the-suggestion" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- Preview the recommendation</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">select</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">table_fqn</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="n">suggested_cluster_key</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">suggested_cluster_key_confidence</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="n">is_candidate</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_databricks__liquid_clustering_candidates</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">where</span><span class="w"> </span><span class="n">snapshot_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">current_date</span><span class="p">()</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">is_candidate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="c1">-- Apply liquid clustering once you've validated the column</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">my_catalog</span><span class="p">.</span><span class="n">my_schema</span><span class="p">.</span><span class="n">my_table</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="k">CLUSTER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="p">(</span><span class="n">suggested_column_name</span><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="sample-queries">Sample Queries<a class="headerlink" href="#sample-queries" title="Permanent link">#</a></h2>
+<h3 id="top-candidates-by-score">Top candidates by score<a class="headerlink" href="#top-candidates-by-score" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">select</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">table_fqn</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">dbt_model</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">score</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="n">is_candidate</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="n">table_size_gb</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="n">current_file_count</span><span class="p">,</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">avg_file_size_mb</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">select_count</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="n">dml_count</span><span class="p">,</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="n">query_to_dml_ratio</span><span class="p">,</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="n">avg_query_duration_s</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_databricks__liquid_clustering_candidates</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="k">where</span><span class="w"> </span><span class="n">snapshot_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">current_date</span><span class="p">()</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="fragmented-tables-with-high-query-activity">Fragmented tables with high query activity<a class="headerlink" href="#fragmented-tables-with-high-query-activity" title="Permanent link">#</a></h3>
+<p>Tables where queries scan many files are the most likely to see immediate improvement.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">select</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">table_fqn</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">dbt_model</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">current_file_count</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">avg_file_size_mb</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">avg_files_scanned</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="n">select_count</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">avg_query_duration_s</span><span class="p">,</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="n">is_candidate</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_databricks__liquid_clustering_candidates</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="k">where</span><span class="w"> </span><span class="n">snapshot_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">current_date</span><span class="p">()</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">select_count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">avg_files_scanned</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="historical-trend-for-a-specific-table">Historical trend for a specific table<a class="headerlink" href="#historical-trend-for-a-specific-table" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">select</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">snapshot_date</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">score</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">is_candidate</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">current_file_count</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">avg_file_size_mb</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="n">select_count</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">avg_query_duration_s</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_databricks__liquid_clustering_candidates</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">where</span><span class="w"> </span><span class="n">table_fqn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'my_catalog.my_schema.my_table'</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">snapshot_date</span><span class="p">;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>system.storage enablement:</strong> <code>system.storage.table_metrics_history</code> must be explicitly enabled by a Databricks account admin before data appears. The table is populated once per day — allow up to 24 hours after enablement for the first snapshot.</li>
+<li><strong>statement_text redaction:</strong> If your workspace uses customer-managed keys, <code>statement_text</code> in <code>system.query.history</code> will be empty. This means query-to-table attribution via text matching will not work and <code>select_count</code>/<code>dml_count</code> will be 0 for all tables. The storage-based columns (<code>file_count</code>, <code>avg_file_size_mb</code>, <code>size_gb</code>) are unaffected.</li>
+<li><strong>Query attribution approach:</strong> Unlike Snowflake's ACCESS_HISTORY (which provides exact table-level attribution), Databricks query-to-table matching uses <code>statement_text ilike '%table_name%'</code>. This is approximate — it may miss queries that reference tables by alias only, and may over-count if a table name appears as a substring of another.</li>
+<li><strong>Partitioning vs Liquid Clustering:</strong> Liquid Clustering replaces traditional Hive-style partitioning for Delta tables. If a table has existing partition columns, <code>is_already_clustered</code> will be <code>true</code> and it will not appear as a candidate unless you explicitly evaluate it.</li>
+<li><strong>Incremental snapshots:</strong> The fact model produces one snapshot per day. Running it multiple times in the same day merges into the existing snapshot for that date rather than creating duplicates.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../incremental_model_candidates/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Incremental model candidates">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Incremental model candidates
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../optimize_candidates/" class="md-footer__link md-footer__link--next" aria-label="Next: OPTIMIZE candidates">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                OPTIMIZE candidates
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.footer", "navigation.instant", "navigation.tracking", "content.action.edit", "content.code.copy", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

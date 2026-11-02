@@ -1,0 +1,2440 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Find cost optimization opportunities in your dbt project on Snowflake, Databricks, BigQuery and Redshift.">
+      
+      
+      
+        <link rel="canonical" href="https://dbt-labs.github.io/dbt-cost-optimization/1.0/snowflake/reference/ai_cortex_spend_optimization/">
+      
+      
+        <link rel="prev" href="../table_clustering_candidates/">
+      
+      
+        <link rel="next" href="../optimization_priorities_mapping/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>AI and Cortex spend - dbt Cost Optimization Package</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#aicortex-spend-optimization-design-document" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="dbt Cost Optimization Package" class="md-header__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dbt Cost Optimization Package
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              AI and Cortex spend
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="dbt Cost Optimization Package" class="md-nav__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    dbt Cost Optimization Package
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Snowflake
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick-use commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recommendations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recommendations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gold_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../warehouse_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table materialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../table_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Sources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#high-level-metering-credits-billed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        High-Level Metering (credits billed)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#granular-usage-views-per-queryper-model-detail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Granular Usage Views (per-query/per-model detail)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-view-overlap-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important: View Overlap Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#latency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latency
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proposed-dag-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proposed DAG Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mart-model-specifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mart Model Specifications
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mart Model Specifications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_spend_overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_spend_overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_model_cost_recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_model_cost_recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_user_spend_recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_user_spend_recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_token_efficiency_recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_token_efficiency_recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configurable-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configurable Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scoring-formulas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scoring Formulas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scoring Formulas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_spend_overview_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_spend_overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_model_cost_recommendations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_model_cost_recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_user_spend_recommendations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_user_spend_recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fct_snowflake__ai_token_efficiency_recommendations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fct_snowflake__ai_token_efficiency_recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sample Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ai-spend-by-service-type-executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI spend by service type (executive summary)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#models-to-downgrade-or-optimize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Models to downgrade or optimize
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#users-with-spending-spikes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Users with spending spikes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-bloat-and-caching-opportunities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt bloat and caching opportunities
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governance-gaps-untagged-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governance gaps (untagged queries)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-optimization-levers-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Optimization Levers (Summary)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edition-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edition Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primary-guides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Guides
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#account-usage-view-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Account Usage View References
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#community-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Community Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-snowflake-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Snowflake Functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization_priorities_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization priorities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../warehouse_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future_optimizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/incremental_model_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/liquid_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/optimize_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPTIMIZE candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/model_run_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model run summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigQuery (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../bigquery/clustering_key_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clustering key candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redshift (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Redshift (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/materialization-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/dbt-labs/dbt-cost-optimization/edit/main/docs/snowflake/reference/ai_cortex_spend_optimization.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="aicortex-spend-optimization-design-document">AI/Cortex Spend Optimization — Design Document<a class="headerlink" href="#aicortex-spend-optimization-design-document" title="Permanent link">#</a></h1>
+<p><strong>Status:</strong> Draft<br />
+<strong>Last updated:</strong> 2026-06-09<br />
+<strong>Author:</strong> Jessica Stayton</p>
+<hr />
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">#</a></h2>
+<p>This optimization path tracks and monitors Snowflake Cortex AI consumption (tokens, credits, and dollar spend) and produces actionable recommendations for reducing cost without degrading AI workload quality.</p>
+<hr />
+<h2 id="data-sources">Data Sources<a class="headerlink" href="#data-sources" title="Permanent link">#</a></h2>
+<h3 id="high-level-metering-credits-billed">High-Level Metering (credits billed)<a class="headerlink" href="#high-level-metering-credits-billed" title="Permanent link">#</a></h3>
+<p>Credits appear in <code>SNOWFLAKE.ACCOUNT_USAGE.METERING_HISTORY</code> under 5 AI-specific service types:</p>
+<table>
+<thead>
+<tr>
+<th>Service Type</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AI_SERVICES</code></td>
+<td>Cortex LLM functions (AI_COMPLETE, EXTRACT, etc.), Analyst, Search, Document AI, Fine-tuning</td>
+</tr>
+<tr>
+<td><code>CORTEX_AGENTS</code></td>
+<td>Cortex Agents API and Orchestrator</td>
+</tr>
+<tr>
+<td><code>CORTEX_CODE_CLI</code></td>
+<td>Cortex Code CLI</td>
+</tr>
+<tr>
+<td><code>CORTEX_CODE_SNOWSIGHT</code></td>
+<td>Cortex Code in Snowsight</td>
+</tr>
+<tr>
+<td><code>SNOWFLAKE_INTELLIGENCE</code></td>
+<td>Snowflake Intelligence features</td>
+</tr>
+</tbody>
+</table>
+<p>Additionally, <code>AI_INFERENCE</code> (Cortex REST API) is billed in <strong>dollars</strong> (not credits) and does NOT appear in METERING_DAILY. It has its own view: <code>CORTEX_REST_API_USAGE_HISTORY</code>.</p>
+<h3 id="granular-usage-views-per-queryper-model-detail">Granular Usage Views (per-query/per-model detail)<a class="headerlink" href="#granular-usage-views-per-queryper-model-detail" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Canonical View</th>
+<th>Grain</th>
+<th>Key Columns</th>
+<th>Maps To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CORTEX_AISQL_USAGE_HISTORY</code></td>
+<td>Per query x model x function</td>
+<td>query_id, function_name, model_name, user_id, tokens (input/output), token_credits, warehouse_id, query_tag</td>
+<td>AI_SERVICES</td>
+</tr>
+<tr>
+<td><code>CORTEX_AGENT_USAGE_HISTORY</code></td>
+<td>Per request (hierarchical)</td>
+<td>agent name, schema, token_credits, parent_request_id</td>
+<td>CORTEX_AGENTS</td>
+</tr>
+<tr>
+<td><code>SNOWFLAKE_INTELLIGENCE_USAGE_HISTORY</code></td>
+<td>Per request (hierarchical)</td>
+<td>token_credits, AI function credits</td>
+<td>SNOWFLAKE_INTELLIGENCE</td>
+</tr>
+<tr>
+<td><code>CORTEX_ANALYST_USAGE_HISTORY</code></td>
+<td>Hourly by user</td>
+<td>credits, request_count</td>
+<td>AI_SERVICES</td>
+</tr>
+<tr>
+<td><code>CORTEX_SEARCH_SERVING_USAGE_HISTORY</code></td>
+<td>Hourly</td>
+<td>credits (serving)</td>
+<td>AI_SERVICES</td>
+</tr>
+<tr>
+<td><code>CORTEX_SEARCH_BATCH_QUERY_USAGE_HISTORY</code></td>
+<td>Batch tokens + storage</td>
+<td>embed tokens</td>
+<td>AI_SERVICES</td>
+</tr>
+<tr>
+<td><code>CORTEX_DOCUMENT_PROCESSING_USAGE_HISTORY</code></td>
+<td>Per doc processing job</td>
+<td>credits_used, pages</td>
+<td>AI_SERVICES</td>
+</tr>
+<tr>
+<td><code>CORTEX_FINE_TUNING_USAGE_HISTORY</code></td>
+<td>Hourly</td>
+<td>token_credits</td>
+<td>AI_SERVICES</td>
+</tr>
+<tr>
+<td><code>CORTEX_CODE_CLI_USAGE_HISTORY</code></td>
+<td>Per usage</td>
+<td>token_credits</td>
+<td>CORTEX_CODE_CLI</td>
+</tr>
+<tr>
+<td><code>CORTEX_CODE_SNOWSIGHT_USAGE_HISTORY</code></td>
+<td>Per usage</td>
+<td>token_credits</td>
+<td>CORTEX_CODE_SNOWSIGHT</td>
+</tr>
+<tr>
+<td><code>CORTEX_REST_API_USAGE_HISTORY</code></td>
+<td>Per request</td>
+<td>tokens (input/output), model</td>
+<td>Dollar-billed (not in METERING)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="important-view-overlap-rules">Important: View Overlap Rules<a class="headerlink" href="#important-view-overlap-rules" title="Permanent link">#</a></h3>
+<ul>
+<li><code>CORTEX_FUNCTIONS_USAGE_HISTORY</code> (deprecated) -&gt; <code>CORTEX_AI_FUNCTIONS_USAGE_HISTORY</code> (intermediate) -&gt; <code>CORTEX_AISQL_USAGE_HISTORY</code> (current canonical). <strong>Do not sum these together.</strong></li>
+<li><code>DOCUMENT_AI_USAGE_HISTORY</code> is a subset of <code>CORTEX_DOCUMENT_PROCESSING_USAGE_HISTORY</code>. <strong>Do not sum both.</strong></li>
+<li>The sum of all granular views will NOT exactly match <code>METERING_HISTORY</code> for <code>AI_SERVICES</code> — this is expected (subset exposure). Use granular views for relative attribution, not exact reconciliation.</li>
+</ul>
+<h3 id="latency">Latency<a class="headerlink" href="#latency" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>View</th>
+<th>Max Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CORTEX_AI_FUNCTIONS_USAGE_HISTORY</code></td>
+<td>60 minutes</td>
+</tr>
+<tr>
+<td><code>CORTEX_REST_API_USAGE_HISTORY</code></td>
+<td>45 minutes</td>
+</tr>
+<tr>
+<td><code>CORTEX_AGENT_USAGE_HISTORY</code></td>
+<td>~3 hours</td>
+</tr>
+<tr>
+<td><code>METERING_HISTORY</code></td>
+<td>~3 hours</td>
+</tr>
+<tr>
+<td><code>METERING_DAILY_HISTORY</code> (org-level)</td>
+<td>~2 hours</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="proposed-dag-structure">Proposed DAG Structure<a class="headerlink" href="#proposed-dag-structure" title="Permanent link">#</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>models/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  staging/snowflake/
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    stg_snowflake__metering_history.sql              -- filtered to AI service types only
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    stg_snowflake__cortex_aisql_usage.sql            -- canonical per-query LLM usage
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    stg_snowflake__cortex_agent_usage.sql            -- Cortex Agent usage
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    stg_snowflake__cortex_search_usage.sql           -- Search serving credits
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    stg_snowflake__cortex_rest_api_usage.sql         -- REST API (dollar-billed, separate)
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  intermediate/snowflake/
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    int_snowflake__ai_spend_daily.sql                -- daily credits by service type
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    int_snowflake__ai_model_usage_daily.sql          -- daily by model x function (tokens + credits)
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    int_snowflake__ai_user_usage_daily.sql           -- daily by user (top consumers)
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    int_snowflake__ai_agent_usage_daily.sql          -- daily by Cortex Agent name
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>  marts/snowflake/ai/
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    fct_snowflake__ai_spend_overview.sql             -- total AI spend summary + trend
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    fct_snowflake__ai_model_cost_recommendations.sql -- model selection optimization
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    fct_snowflake__ai_user_spend_recommendations.sql -- per-user budget recommendations
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    fct_snowflake__ai_token_efficiency_recommendations.sql -- prompt/response optimization
+</span></code></pre></div>
+<hr />
+<h2 id="mart-model-specifications">Mart Model Specifications<a class="headerlink" href="#mart-model-specifications" title="Permanent link">#</a></h2>
+<h3 id="fct_snowflake__ai_spend_overview"><code>fct_snowflake__ai_spend_overview</code><a class="headerlink" href="#fct_snowflake__ai_spend_overview" title="Permanent link">#</a></h3>
+<p><strong>Purpose:</strong> Executive-level summary of AI spend across all service types with trend analysis.</p>
+<p><strong>Grain:</strong> One row per (service_type, stats_date) or one row per service_type (summary).</p>
+<p><strong>Key outputs:</strong>
+- Total AI credits by service type (30-day window)
+- Week-over-week and month-over-month growth rates
+- Projected monthly/annual cost (using configurable credit_rate_usd)
+- Percentage breakdown by service type</p>
+<hr />
+<h3 id="fct_snowflake__ai_model_cost_recommendations"><code>fct_snowflake__ai_model_cost_recommendations</code><a class="headerlink" href="#fct_snowflake__ai_model_cost_recommendations" title="Permanent link">#</a></h3>
+<p><strong>Purpose:</strong> Identify opportunities to use cheaper models or optimize prompt design.</p>
+<p><strong>Grain:</strong> One row per (model_name, function_name) combination with recommendations.</p>
+<p><strong>Recommendation logic:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Detection</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Expensive model for simple output</td>
+<td>avg output tokens &lt; <code>ai_model_downgrade_output_token_threshold</code> (default 100)</td>
+<td>"Downgrade to cheaper model (e.g., llama3.1-8b or mistral-7b)"</td>
+</tr>
+<tr>
+<td>High input:output ratio</td>
+<td>avg input tokens &gt; 10x avg output tokens</td>
+<td>"Prompt likely over-contextualized — trim system prompts"</td>
+</tr>
+<tr>
+<td>Batch opportunity</td>
+<td>Same model+function called 100+ times/day with low variance in input size</td>
+<td>"Consider batching or caching responses"</td>
+</tr>
+<tr>
+<td>Cost-inefficient model for task</td>
+<td>Model X costs 10x more per token than Model Y for same function, similar output quality proxy</td>
+<td>"Evaluate switching from Model X to Model Y"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key metrics per model:</strong>
+- total_credits_30d
+- total_tokens_input / total_tokens_output
+- avg_tokens_per_query
+- cost_per_1k_output_tokens (derived from credits / output tokens)
+- unique_users, query_count</p>
+<hr />
+<h3 id="fct_snowflake__ai_user_spend_recommendations"><code>fct_snowflake__ai_user_spend_recommendations</code><a class="headerlink" href="#fct_snowflake__ai_user_spend_recommendations" title="Permanent link">#</a></h3>
+<p><strong>Purpose:</strong> Identify top consumers, detect spikes, and suggest per-user budget thresholds.</p>
+<p><strong>Grain:</strong> One row per user.</p>
+<p><strong>Recommendation logic:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Detection</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sudden spike</td>
+<td>7-day spend &gt; <code>ai_user_spike_threshold_pct</code> (default 200%) of 30-day daily average</td>
+<td>"User X spending 3x their baseline — investigate"</td>
+</tr>
+<tr>
+<td>Concentration risk</td>
+<td>Single user &gt; 50% of total AI spend</td>
+<td>"Heavy concentration — consider distributing workload or setting budget caps"</td>
+</tr>
+<tr>
+<td>No attribution</td>
+<td>User's queries lack query_tag</td>
+<td>"Governance gap — set QUERY_TAG for cost attribution by project/team"</td>
+</tr>
+<tr>
+<td>Budget suggestion</td>
+<td>Based on historical p90 usage</td>
+<td>"Suggested monthly budget: X credits (based on p90 of last 90 days)"</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="fct_snowflake__ai_token_efficiency_recommendations"><code>fct_snowflake__ai_token_efficiency_recommendations</code><a class="headerlink" href="#fct_snowflake__ai_token_efficiency_recommendations" title="Permanent link">#</a></h3>
+<p><strong>Purpose:</strong> Surface token-level inefficiencies — prompt bloat, wasted completions, repeated queries.</p>
+<p><strong>Grain:</strong> One row per (query_hash or query_tag grouping) with recommendations.</p>
+<p><strong>Recommendation logic:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Detection</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prompt bloat</td>
+<td>Input tokens &gt; <code>ai_prompt_bloat_input_token_threshold</code> (default 10000)</td>
+<td>"Queries averaging 15K input tokens — trim context or use RAG/search instead"</td>
+</tr>
+<tr>
+<td>Repeated identical queries</td>
+<td>Same query_tag + model, 50+ identical calls/day</td>
+<td>"Caching opportunity — implement application-level caching for repeated prompts"</td>
+</tr>
+<tr>
+<td>Low efficiency ratio</td>
+<td>Credits consumed but IS_COMPLETED = false on many rows</td>
+<td>"High cancellation/failure rate — investigate prompt quality or timeout settings"</td>
+</tr>
+<tr>
+<td>Runaway queries</td>
+<td>Single query consuming &gt; X credits (across hourly windows)</td>
+<td>"Potential runaway — consider STATEMENT_TIMEOUT_IN_SECONDS or per-query credit limits"</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="configurable-variables">Configurable Variables<a class="headerlink" href="#configurable-variables" title="Permanent link">#</a></h2>
+<p>Set these in your project's <code>dbt_project.yml</code> <code>vars:</code> section (or with <code>--vars</code>):</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># dbt_project.yml</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">vars</span><span class="p">:</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="c1"># Lookback windows</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">ai_spend_lookback_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">incremental_overlap_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">31</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="c1"># Model recommendation thresholds</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">ai_model_downgrade_output_token_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nt">ai_prompt_bloat_input_token_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10000</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="nt">ai_batch_opportunity_min_daily_calls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="c1"># User recommendation thresholds</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">ai_user_spike_threshold_pct</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="nt">ai_user_concentration_threshold_pct</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="c1"># Cost projection</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="nt">ai_credit_rate_usd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">  </span><span class="c1"># Minimum activity for recommendations</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">  </span><span class="nt">ai_min_credits_for_recommendation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">  </span><span class="nt">ai_min_queries_for_recommendation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+</span></code></pre></div>
+<p>To leave Cortex REST API usage (billed in dollars) out of the analysis, set the environment variable <code>DBT_COST_OPTIMIZATION_AI_REST_API_ENABLED=false</code>. It switches models on and off, so on dbt v1 it's an environment variable rather than a var.</p>
+<hr />
+<h2 id="scoring-formulas">Scoring Formulas<a class="headerlink" href="#scoring-formulas" title="Permanent link">#</a></h2>
+<h3 id="fct_snowflake__ai_spend_overview_1"><code>fct_snowflake__ai_spend_overview</code><a class="headerlink" href="#fct_snowflake__ai_spend_overview_1" title="Permanent link">#</a></h3>
+<p>No scoring — this is a summary model. Key computed columns:
+- <code>projected_annual_cost_usd = (total_credits / active_days) * 365 * credit_rate_usd</code>
+- <code>pct_of_total_ai_spend = service_type_credits / sum(all_service_credits) * 100</code>
+- <code>wow_trend</code> = week-over-week comparison (Growing/Declining/Stable/New)</p>
+<h3 id="fct_snowflake__ai_model_cost_recommendations_1"><code>fct_snowflake__ai_model_cost_recommendations</code><a class="headerlink" href="#fct_snowflake__ai_model_cost_recommendations_1" title="Permanent link">#</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>projected_annual_cost_usd = (total_credits / lookback_days) * 365 * credit_rate_usd
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cost_per_1k_output_tokens = total_credits / total_output_tokens * 1000
+</span></code></pre></div>
+<p>Decision logic:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>if avg_output_tokens &lt; 100 AND total_credits &gt; 5:     → model_downgrade
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>elif avg_input_tokens &gt; 10000:                        → prompt_bloat
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>elif avg_daily_calls &gt; 100:                           → batch_opportunity
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>else:                                                 → monitor
+</span></code></pre></div></p>
+<h3 id="fct_snowflake__ai_user_spend_recommendations_1"><code>fct_snowflake__ai_user_spend_recommendations</code><a class="headerlink" href="#fct_snowflake__ai_user_spend_recommendations_1" title="Permanent link">#</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>projected_annual_cost_usd = avg_daily_credits * 365 * credit_rate_usd
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pct_of_account_spend = user_credits / total_account_credits * 100
+</span></code></pre></div>
+<p>Decision logic:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>if 7d_avg_daily &gt; 30d_avg_daily * (spike_threshold/100):  → spike
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>elif user_credits / total &gt; concentration_threshold:       → concentration
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>elif untagged_queries &gt; tagged_queries:                    → no_attribution
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>else:                                                      → healthy
+</span></code></pre></div></p>
+<h3 id="fct_snowflake__ai_token_efficiency_recommendations_1"><code>fct_snowflake__ai_token_efficiency_recommendations</code><a class="headerlink" href="#fct_snowflake__ai_token_efficiency_recommendations_1" title="Permanent link">#</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>projected_annual_cost_usd = (total_credits / lookback_days) * 365 * credit_rate_usd
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>input_output_ratio = avg_input_tokens / avg_output_tokens
+</span></code></pre></div>
+<p>Decision logic (priority order):
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>if incomplete_pct &gt; 20% AND total_credits &gt; 5:            → high_failure_rate
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>elif avg_input_tokens &gt; 10000:                            → prompt_bloat
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>elif avg_daily_calls &gt; 100 AND input_output_ratio &gt; 5:   → cache_candidate
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>elif input_output_ratio &gt; 50:                             → extreme_ratio
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>else:                                                     → efficient
+</span></code></pre></div></p>
+<hr />
+<h2 id="sample-queries">Sample Queries<a class="headerlink" href="#sample-queries" title="Permanent link">#</a></h2>
+<h3 id="ai-spend-by-service-type-executive-summary">AI spend by service type (executive summary)<a class="headerlink" href="#ai-spend-by-service-type-executive-summary" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">select</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">service_type</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">total_credits</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="n">projected_annual_cost_usd</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="n">pct_of_total_ai_spend</span><span class="p">,</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="n">wow_trend</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="n">credits_last_7d</span><span class="p">,</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="n">credits_prior_7d</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_snowflake__ai_spend_overview</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">total_credits</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="models-to-downgrade-or-optimize">Models to downgrade or optimize<a class="headerlink" href="#models-to-downgrade-or-optimize" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">select</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">function_name</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">avg_output_tokens</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="n">avg_input_tokens</span><span class="p">,</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="n">projected_annual_cost_usd</span><span class="p">,</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="n">cost_per_1k_output_tokens</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">recommendation</span><span class="p">,</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="n">recommendation_reason</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_snowflake__ai_model_cost_recommendations</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="k">where</span><span class="w"> </span><span class="n">recommendation</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'Monitor — no immediate action'</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">projected_annual_cost_usd</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="users-with-spending-spikes">Users with spending spikes<a class="headerlink" href="#users-with-spending-spikes" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">select</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">user_name</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="n">email</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="n">default_role</span><span class="p">,</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="n">total_credits_30d</span><span class="p">,</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="n">avg_daily_credits_7d</span><span class="p">,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="n">avg_daily_credits</span><span class="p">,</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="n">pct_of_account_spend</span><span class="p">,</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="n">projected_annual_cost_usd</span><span class="p">,</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="n">recommendation</span><span class="p">,</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="n">recommendation_reason</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_snowflake__ai_user_spend_recommendations</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="k">where</span><span class="w"> </span><span class="n">recommendation</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">'Investigate%'</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="n">recommendation</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">'High%'</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">total_credits_30d</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="prompt-bloat-and-caching-opportunities">Prompt bloat and caching opportunities<a class="headerlink" href="#prompt-bloat-and-caching-opportunities" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">select</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="n">function_name</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="n">query_pattern</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">avg_input_tokens</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="n">avg_output_tokens</span><span class="p">,</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="n">input_output_ratio</span><span class="p">,</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="n">avg_daily_calls</span><span class="p">,</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="n">projected_annual_cost_usd</span><span class="p">,</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="n">recommendation</span><span class="p">,</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span><span class="n">recommendation_reason</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_snowflake__ai_token_efficiency_recommendations</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="k">where</span><span class="w"> </span><span class="n">recommendation</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'Efficient — no action needed'</span>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">projected_annual_cost_usd</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="governance-gaps-untagged-queries">Governance gaps (untagged queries)<a class="headerlink" href="#governance-gaps-untagged-queries" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">select</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="n">user_name</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="n">untagged_queries</span><span class="p">,</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="n">tagged_queries</span><span class="p">,</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="n">round</span><span class="p">(</span><span class="n">untagged_queries</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">.</span><span class="mi">0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">nullif</span><span class="p">(</span><span class="n">tagged_queries</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">untagged_queries</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">pct_untagged</span><span class="p">,</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="n">total_credits_30d</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_snowflake__ai_user_spend_recommendations</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="k">where</span><span class="w"> </span><span class="n">recommendation</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">'Governance%'</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">total_credits_30d</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="key-optimization-levers-summary">Key Optimization Levers (Summary)<a class="headerlink" href="#key-optimization-levers-summary" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Lever</th>
+<th>Source Signal</th>
+<th>Expected Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model downgrade</td>
+<td>High-cost model with simple outputs</td>
+<td>5-10x cost reduction per query</td>
+</tr>
+<tr>
+<td>Prompt trimming</td>
+<td>High input:output ratio</td>
+<td>2-5x reduction in input token cost</td>
+</tr>
+<tr>
+<td>Caching</td>
+<td>Repeated identical prompts</td>
+<td>Eliminates redundant token spend entirely</td>
+</tr>
+<tr>
+<td>Agent loop limits</td>
+<td>Long parent_request_id chains</td>
+<td>Prevents runaway credit consumption</td>
+</tr>
+<tr>
+<td>Search right-sizing</td>
+<td>Serving credits vs actual query volume</td>
+<td>Reduce idle search service cost</td>
+</tr>
+<tr>
+<td>User budgets</td>
+<td>Concentration risk</td>
+<td>Governance + predictability</td>
+</tr>
+<tr>
+<td>REST API visibility</td>
+<td>Dollar-billed spend invisible in credit dashboards</td>
+<td>Surface hidden costs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="edition-requirements">Edition Requirements<a class="headerlink" href="#edition-requirements" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Standard</th>
+<th>Enterprise+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>METERING_HISTORY</code> (AI service types)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>CORTEX_AISQL_USAGE_HISTORY</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>CORTEX_AI_FUNCTIONS_USAGE_HISTORY</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>CORTEX_AGENT_USAGE_HISTORY</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>CORTEX_REST_API_USAGE_HISTORY</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>ORGANIZATION_USAGE</code> views (cross-account)</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>All AI usage views are available on Standard edition. No Enterprise+ gating required for this optimization path.</p>
+<hr />
+<h2 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">#</a></h2>
+<ol>
+<li><strong>Scope:</strong> Should we also include Cortex Search index build costs (serverless compute), or just serving/query costs?</li>
+<li><strong>REST API handling:</strong> Since REST API is dollar-billed (not credits), should it be a separate mart or integrated into the overview with a conversion factor?</li>
+<li><strong>Agent recursion depth:</strong> Should we detect and flag deeply-nested agent calls (many parent_request_id hops) as a cost risk?</li>
+<li><strong>Fine-tuning:</strong> Include fine-tuning cost tracking, or defer (likely low volume for most users)?</li>
+<li><strong>Cortex Code tracking:</strong> Some users may not want to surface their own CoCo/Cortex Code usage in recommendations. Should this be opt-in via a variable?</li>
+</ol>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">#</a></h2>
+<h3 id="primary-guides">Primary Guides<a class="headerlink" href="#primary-guides" title="Permanent link">#</a></h3>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/ai-func-cost-management">Managing Cortex AI Function costs with Account Usage</a></li>
+<li><a href="https://www.snowflake.com/legal-files/CreditConsumptionTable.pdf">Snowflake Service Consumption Table (token pricing per model)</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-rest-api">Cortex REST API overview</a></li>
+</ul>
+<h3 id="account-usage-view-references">Account Usage View References<a class="headerlink" href="#account-usage-view-references" title="Permanent link">#</a></h3>
+<ul>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_aisql_usage_history">CORTEX_AISQL_USAGE_HISTORY</a> — canonical per-query LLM token/credit usage</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_ai_functions_usage_history">CORTEX_AI_FUNCTIONS_USAGE_HISTORY</a> — per-query function usage (hourly windows)</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_agent_usage_history">CORTEX_AGENT_USAGE_HISTORY</a> — Cortex Agents billing</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_analyst_usage_history">CORTEX_ANALYST_USAGE_HISTORY</a> — Cortex Analyst usage</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_search_serving_usage_history">CORTEX_SEARCH_SERVING_USAGE_HISTORY</a> — Search serving credits</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_search_daily_usage_history">CORTEX_SEARCH_DAILY_USAGE_HISTORY</a> — Search daily aggregated</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_search_batch_query_usage_history">CORTEX_SEARCH_BATCH_QUERY_USAGE_HISTORY</a> — Batch embed tokens</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_document_processing_usage_history">CORTEX_DOCUMENT_PROCESSING_USAGE_HISTORY</a> — Document AI / AI_PARSE_DOCUMENT</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_fine_tuning_usage_history">CORTEX_FINE_TUNING_USAGE_HISTORY</a> — Fine-tuning token credits</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_code_cli_usage_history">CORTEX_CODE_CLI_USAGE_HISTORY</a> — Cortex Code CLI usage</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_code_snowsight_usage_history">CORTEX_CODE_SNOWSIGHT_USAGE_HISTORY</a> — Cortex Code in Snowsight usage</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/cortex_rest_api_usage_history">CORTEX_REST_API_USAGE_HISTORY</a> — REST API (dollar-billed)</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/snowflake_intelligence_usage_history">SNOWFLAKE_INTELLIGENCE_USAGE_HISTORY</a> — Snowflake Intelligence</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/account-usage/metering_history">METERING_HISTORY</a> — Account-level credit metering</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/organization-usage/metering_daily_history">METERING_DAILY_HISTORY (Organization Usage)</a> — Org-level daily credits</li>
+</ul>
+<h3 id="community-resources">Community Resources<a class="headerlink" href="#community-resources" title="Permanent link">#</a></h3>
+<ul>
+<li><a href="https://community.snowflake.com/s/article/how-to-track-and-understand-cortex-ai-related-charges">How to track and understand Cortex AI-related charges</a> — comprehensive FAQ on the "Big Five" AI service types and view lineage</li>
+</ul>
+<h3 id="related-snowflake-functions">Related Snowflake Functions<a class="headerlink" href="#related-snowflake-functions" title="Permanent link">#</a></h3>
+<ul>
+<li><a href="https://docs.snowflake.com/en/sql-reference/functions/ai_count_tokens">AI_COUNT_TOKENS</a> — estimate token count before calling LLM functions</li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/functions/system_cancel_query">SYSTEM$CANCEL_QUERY</a> — cancel runaway queries programmatically</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../table_clustering_candidates/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Table clustering">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Table clustering
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../optimization_priorities_mapping/" class="md-footer__link md-footer__link--next" aria-label="Next: Optimization priorities">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Optimization priorities
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.footer", "navigation.instant", "navigation.tracking", "content.action.edit", "content.code.copy", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

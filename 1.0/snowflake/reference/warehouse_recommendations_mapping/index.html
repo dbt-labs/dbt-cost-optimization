@@ -1,0 +1,2228 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Find cost optimization opportunities in your dbt project on Snowflake, Databricks, BigQuery and Redshift.">
+      
+      
+      
+        <link rel="canonical" href="https://dbt-labs.github.io/dbt-cost-optimization/1.0/snowflake/reference/warehouse_recommendations_mapping/">
+      
+      
+        <link rel="prev" href="../optimization_priorities_mapping/">
+      
+      
+        <link rel="next" href="../incremental_recommendations_mapping/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Warehouse recommendation mapping - dbt Cost Optimization Package</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#warehouse-recommendations-mapping" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="dbt Cost Optimization Package" class="md-header__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dbt Cost Optimization Package
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Warehouse recommendation mapping
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="dbt Cost Optimization Package" class="md-nav__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    dbt Cost Optimization Package
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Snowflake
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick-use commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recommendations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recommendations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gold_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../warehouse_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table materialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../table_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai_cortex_spend_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization_priorities_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization priorities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#signal-availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signal Availability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-high-idle-credits-priority-high-direct-cost-waste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. HIGH IDLE CREDITS (Priority: High -- direct cost waste)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-overload-queuing-priority-high-performance-degradation-potential-cost-if-queries-are-long" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. OVERLOAD QUEUING (Priority: High -- performance degradation + potential cost if queries are long)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-provisioning-queue-priority-medium-latency-impact-especially-for-interactive-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. PROVISIONING QUEUE (Priority: Medium -- latency impact, especially for interactive users)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-spillage-priority-medium-high-performance-and-potential-remote-spill-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. SPILLAGE (Priority: Medium-High -- performance and potential remote spill cost)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-oversized-warehouse-priority-medium-cost-savings-opportunity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. OVERSIZED WAREHOUSE (Priority: Medium -- cost savings opportunity)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-expensive-query-cost-growth-priority-medium-creeping-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. EXPENSIVE QUERY COST GROWTH (Priority: Medium -- creeping cost)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-stable-no-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. STABLE / NO ACTION
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-signals-not-currently-measured-to-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Signals NOT Currently Measured (to add)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#size-ladder-reference-for-ddl-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Size Ladder Reference (for DDL generation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../incremental_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future_optimizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/incremental_model_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/liquid_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/optimize_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPTIMIZE candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../databricks/model_run_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model run summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigQuery (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../bigquery/clustering_key_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clustering key candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redshift (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Redshift (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../redshift/materialization-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/dbt-labs/dbt-cost-optimization/edit/main/docs/snowflake/reference/warehouse_recommendations_mapping.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="warehouse-recommendations-mapping">Warehouse Recommendations Mapping<a class="headerlink" href="#warehouse-recommendations-mapping" title="Permanent link">#</a></h1>
+<p>Complete symptom-to-optimization map for warehouse-level recommendations. Organized by symptom priority (most costly first), with all config branches, edition constraints, and flags for what's not currently measured.</p>
+<hr />
+<h2 id="signal-availability">Signal Availability<a class="headerlink" href="#signal-availability" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th style="text-align: center;">Currently Measured?</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>idle_credit_pct</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_DAILY</td>
+</tr>
+<tr>
+<td><code>median_overload_ms</code> / <code>overload_to_elapsed_ratio</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_QUERY_STATS_DAILY</td>
+</tr>
+<tr>
+<td><code>median_provisioning_ms</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_QUERY_STATS_DAILY</td>
+</tr>
+<tr>
+<td><code>total_gb_spilled_local</code> / <code>remote</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_SPILLAGE_DAILY</td>
+</tr>
+<tr>
+<td><code>avg_query_load_pct</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_QUERY_STATS_DAILY</td>
+</tr>
+<tr>
+<td><code>is_multicluster</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG: a second cluster spun up in the last 90 days (WAREHOUSE_EVENTS_HISTORY), or <code>max_cluster_count &gt; 1</code> in SHOW WAREHOUSES</td>
+</tr>
+<tr>
+<td><code>warehouse_size</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG</td>
+</tr>
+<tr>
+<td><code>is_gen2</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG</td>
+</tr>
+<tr>
+<td><code>auto_suspend</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG (via refresh_warehouse_config post-hook, SHOW WAREHOUSES)</td>
+</tr>
+<tr>
+<td><code>auto_resume</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG (via refresh_warehouse_config post-hook, SHOW WAREHOUSES)</td>
+</tr>
+<tr>
+<td><code>scaling_policy</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG (via refresh_warehouse_config post-hook, SHOW WAREHOUSES)</td>
+</tr>
+<tr>
+<td><code>max_cluster_count</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG (via refresh_warehouse_config post-hook, SHOW WAREHOUSES)</td>
+</tr>
+<tr>
+<td><code>min_cluster_count</code></td>
+<td style="text-align: center;">Yes</td>
+<td>INT_SNOWFLAKE__WAREHOUSE_CONFIG (via refresh_warehouse_config post-hook, SHOW WAREHOUSES)</td>
+</tr>
+<tr>
+<td><code>snowflake_edition</code></td>
+<td style="text-align: center;">No</td>
+<td>Need org account view; we currently have a variable a user can set for this value and a default fallback, and without org admin permissions we cannot access this programmatically from Snowflake</td>
+</tr>
+<tr>
+<td><code>queued_overload_time</code> (per-query)</td>
+<td style="text-align: center;">No</td>
+<td>Available in QUERY_HISTORY but not aggregated</td>
+</tr>
+<tr>
+<td><code>queued_provisioning_time</code> (per-query)</td>
+<td style="text-align: center;">No</td>
+<td>Available in QUERY_HISTORY but not aggregated</td>
+</tr>
+<tr>
+<td><code>avg_queued_load</code></td>
+<td style="text-align: center;">No</td>
+<td>In WAREHOUSE_LOAD_HISTORY, not staged</td>
+</tr>
+<tr>
+<td><code>avg_running</code></td>
+<td style="text-align: center;">No</td>
+<td>In WAREHOUSE_LOAD_HISTORY, not staged</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="1-high-idle-credits-priority-high-direct-cost-waste">1. HIGH IDLE CREDITS (Priority: High -- direct cost waste)<a class="headerlink" href="#1-high-idle-credits-priority-high-direct-cost-waste" title="Permanent link">#</a></h2>
+<p><strong>Signal:</strong> <code>idle_credit_pct &gt; 0.20</code> (30-day window)</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Config Check</th>
+<th>Edition Constraint</th>
+<th>Recommendation (DDL)</th>
+<th>Recommendation Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td><code>auto_suspend &gt; 60</code></td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET AUTO_SUSPEND = 60;</code></td>
+<td>Warehouse is idle {idle_credit_pct}% of the time. Current auto_suspend is {auto_suspend}s -- reducing to 60s will eliminate ~{autosuspend_cycles * (auto_suspend - 60) / 3600} idle credits/month without impacting query performance for most workloads.</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td><code>auto_suspend &lt;= 60 AND is_multicluster = TRUE AND scaling_policy = 'ECONOMY'</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET SCALING_POLICY = 'STANDARD';</code></td>
+<td>Warehouse is idle {idle_credit_pct}% despite auto_suspend={auto_suspend}s. ECONOMY scaling policy keeps clusters running for 2-3 extra minutes after load drops. STANDARD scaling shuts down idle clusters immediately.</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td><code>auto_suspend &lt;= 60 AND is_multicluster = TRUE AND scaling_policy = 'STANDARD' AND max_cluster_count &gt; 2</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET MAX_CLUSTER_COUNT = {max_cluster_count - 1};</code></td>
+<td>Warehouse is idle {idle_credit_pct}% with aggressive suspend and STANDARD scaling. Reducing max clusters from {max_cluster_count} to {max_cluster_count - 1} limits over-provisioning while still allowing scale-out.</td>
+</tr>
+<tr>
+<td>1.4</td>
+<td><code>auto_suspend &lt;= 60 AND is_multicluster = TRUE AND scaling_policy = 'STANDARD' AND max_cluster_count &lt;= 2 AND min_cluster_count &gt; 1</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET MIN_CLUSTER_COUNT = 1;</code></td>
+<td>Warehouse is idle {idle_credit_pct}% but min_cluster_count={min_cluster_count} forces clusters to stay running. Setting min to 1 allows full scale-down during low-demand periods.</td>
+</tr>
+<tr>
+<td>1.5</td>
+<td><code>auto_suspend &lt;= 60 AND is_multicluster = FALSE AND edition = 'STANDARD'</code></td>
+<td>Standard</td>
+<td>No DDL -- operational recommendation</td>
+<td>Warehouse is idle {idle_credit_pct}% with optimal suspend settings. Consolidate workloads onto fewer warehouses or schedule batch jobs into tighter windows to reduce total active time. MCW is not available on Standard edition.</td>
+</tr>
+<tr>
+<td>1.6</td>
+<td><code>auto_suspend &lt;= 60 AND is_multicluster = FALSE AND edition != 'STANDARD' AND avg_query_load_pct &gt; 80</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET MAX_CLUSTER_COUNT = 2, MIN_CLUSTER_COUNT = 1, SCALING_POLICY = 'STANDARD';</code></td>
+<td>Warehouse is idle {idle_credit_pct}% but also hitting high load ({avg_query_load_pct}%). This pattern suggests bursty workloads -- MCW with STANDARD scaling will handle bursts and scale to zero between them.</td>
+</tr>
+<tr>
+<td>1.7</td>
+<td><code>auto_suspend &lt;= 60 AND is_multicluster = FALSE AND avg_query_load_pct &lt; 50</code></td>
+<td>Any</td>
+<td>No DDL -- operational recommendation</td>
+<td>Warehouse is idle {idle_credit_pct}% and underloaded when active ({avg_query_load_pct}% avg load). Consider consolidating this warehouse's workloads into another warehouse to eliminate the idle overhead entirely.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-overload-queuing-priority-high-performance-degradation-potential-cost-if-queries-are-long">2. OVERLOAD QUEUING (Priority: High -- performance degradation + potential cost if queries are long)<a class="headerlink" href="#2-overload-queuing-priority-high-performance-degradation-potential-cost-if-queries-are-long" title="Permanent link">#</a></h2>
+<p><strong>Signal:</strong> <code>overload_to_elapsed_ratio &gt; 0.10 OR median_overload_ms &gt; 500</code></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Config Check</th>
+<th>Edition Constraint</th>
+<th>Recommendation (DDL)</th>
+<th>Recommendation Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.1</td>
+<td><code>is_multicluster = FALSE AND edition != 'STANDARD'</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET MAX_CLUSTER_COUNT = 2, MIN_CLUSTER_COUNT = 1, SCALING_POLICY = 'STANDARD';</code></td>
+<td>Queries are spending {overload_to_elapsed_ratio*100}% of elapsed time queued behind other queries. Enabling multi-cluster allows concurrent workloads to scale out rather than queue.</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td><code>is_multicluster = FALSE AND edition = 'STANDARD' AND size is not max</code></td>
+<td>Standard</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_SIZE = '{next_size_up}';</code></td>
+<td>Queries are spending {overload_to_elapsed_ratio*100}% of elapsed time queued. MCW is not available on Standard edition. Scaling up from {current_size} to {next_size_up} doubles compute capacity to reduce concurrency pressure.</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td><code>is_multicluster = FALSE AND edition = 'STANDARD' AND size is max</code></td>
+<td>Standard</td>
+<td>No DDL -- operational recommendation</td>
+<td>Queries are spending {overload_to_elapsed_ratio*100}% of elapsed time queued. Warehouse is already at maximum size and MCW is unavailable on Standard edition. Options: upgrade edition, split workloads across multiple warehouses, or stagger scheduled jobs.</td>
+</tr>
+<tr>
+<td>2.4</td>
+<td><code>is_multicluster = TRUE AND max_cluster_count &lt; 10 AND scaling_policy = 'ECONOMY'</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET SCALING_POLICY = 'STANDARD';</code></td>
+<td>Queries are queuing ({overload_to_elapsed_ratio*100}% overload ratio) despite MCW being enabled. ECONOMY scaling waits 2-3 minutes before adding clusters -- switching to STANDARD will spin up new clusters immediately when load increases.</td>
+</tr>
+<tr>
+<td>2.5</td>
+<td><code>is_multicluster = TRUE AND max_cluster_count &lt; 10 AND scaling_policy = 'STANDARD'</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET MAX_CLUSTER_COUNT = {max_cluster_count + 1};</code></td>
+<td>Queries are queuing ({overload_to_elapsed_ratio*100}% overload ratio) with STANDARD scaling at max_cluster_count={max_cluster_count}. The warehouse is hitting its cluster ceiling -- increasing by 1 provides additional burst capacity.</td>
+</tr>
+<tr>
+<td>2.6</td>
+<td><code>is_multicluster = TRUE AND max_cluster_count &gt;= 10</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_SIZE = '{next_size_up}';</code></td>
+<td>Queries are queuing ({overload_to_elapsed_ratio*100}% overload ratio) with MCW at {max_cluster_count} clusters. Cluster count is already high -- scaling up warehouse size will give each cluster more compute capacity, reducing per-query execution time and freeing concurrency slots faster.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-provisioning-queue-priority-medium-latency-impact-especially-for-interactive-users">3. PROVISIONING QUEUE (Priority: Medium -- latency impact, especially for interactive users)<a class="headerlink" href="#3-provisioning-queue-priority-medium-latency-impact-especially-for-interactive-users" title="Permanent link">#</a></h2>
+<p><strong>Signal:</strong> <code>median_provisioning_ms &gt; 2000</code> (2s+)</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Config Check</th>
+<th>Edition Constraint</th>
+<th>Recommendation (DDL)</th>
+<th>Recommendation Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.1</td>
+<td><code>auto_suspend &lt; 60 AND auto_resume = TRUE</code></td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET AUTO_SUSPEND = 60;</code></td>
+<td>Median provisioning wait is {median_provisioning_ms}ms -- queries are waiting for the warehouse to cold-start. Current auto_suspend={auto_suspend}s is aggressive, causing frequent suspend/resume cycles. Increasing to 60s reduces cold starts while keeping idle costs minimal.</td>
+</tr>
+<tr>
+<td>3.2</td>
+<td><code>auto_suspend &gt;= 60 AND auto_suspend &lt; 300 AND frequency of resumes is high</code></td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET AUTO_SUSPEND = 300;</code></td>
+<td>Median provisioning wait is {median_provisioning_ms}ms despite auto_suspend={auto_suspend}s. Workload pattern has frequent gaps &gt; {auto_suspend}s but &lt; 5min. Increasing suspend to 300s will keep the warehouse warm between bursts.</td>
+</tr>
+<tr>
+<td>3.3</td>
+<td><code>auto_resume = FALSE</code></td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET AUTO_RESUME = TRUE;</code></td>
+<td>Median provisioning wait is {median_provisioning_ms}ms. AUTO_RESUME is disabled -- queries cannot start until the warehouse is manually resumed. Enable AUTO_RESUME to eliminate manual bottleneck.</td>
+</tr>
+<tr>
+<td>3.4</td>
+<td><code>auto_suspend &gt;= 300 AND is_gen2 = FALSE</code></td>
+<td>Any (if Gen2 eligible)</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_TYPE = 'STANDARD' RESOURCE_CONSTRAINT = 'STANDARD_GEN_2';</code></td>
+<td>Median provisioning wait is {median_provisioning_ms}ms despite generous auto_suspend. Gen2 warehouses provision faster due to improved infrastructure. Consider migrating to Gen2. (Note: Gen2 migration may require testing)</td>
+</tr>
+<tr>
+<td>3.5</td>
+<td><code>is_multicluster = TRUE AND min_cluster_count = 0</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET MIN_CLUSTER_COUNT = 1;</code></td>
+<td>Median provisioning wait is {median_provisioning_ms}ms. MCW is configured with min_cluster_count=0, meaning all clusters can fully suspend. Setting min=1 keeps one cluster warm to serve initial queries instantly. Trade-off: ~{credits_per_hour}/hr idle cost during non-use periods.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-spillage-priority-medium-high-performance-and-potential-remote-spill-cost">4. SPILLAGE (Priority: Medium-High -- performance and potential remote spill cost)<a class="headerlink" href="#4-spillage-priority-medium-high-performance-and-potential-remote-spill-cost" title="Permanent link">#</a></h2>
+<p><strong>Signal:</strong> <code>total_gb_spilled_local &gt; 10 OR total_gb_spilled_remote &gt; 0</code></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Config Check</th>
+<th>Edition Constraint</th>
+<th>Recommendation (DDL)</th>
+<th>Recommendation Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.1</td>
+<td><code>total_gb_spilled_remote &gt; 0</code> (any remote spill)</td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_SIZE = '{next_size_up}';</code></td>
+<td>Remote spillage detected ({total_gb_spilled_remote} GB in 30 days). Remote spill writes to cloud storage, adding significant latency and egress cost. Scaling up from {current_size} provides more local SSD cache before spilling remotely.</td>
+</tr>
+<tr>
+<td>4.2</td>
+<td><code>total_gb_spilled_local &gt; 50 AND total_gb_spilled_remote = 0 AND size NOT in (X-Large through 6X-Large)</code></td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_SIZE = '{next_size_up}';</code></td>
+<td>Heavy local spillage ({total_gb_spilled_local} GB in 30 days) on a {current_size} warehouse. Queries are exceeding available RAM and spilling to local SSD. Scaling up doubles available memory and will reduce or eliminate spillage.</td>
+</tr>
+<tr>
+<td>4.3</td>
+<td><code>total_gb_spilled_local &gt; 50 AND size in (X-Large through 6X-Large)</code></td>
+<td>Any</td>
+<td>No DDL -- SQL optimization recommended</td>
+<td>Heavy local spillage ({total_gb_spilled_local} GB in 30 days) on a {current_size} warehouse. At this size, further scaling has diminishing returns. Review query SQL for: wide JOINs missing filters, unnecessary columns in SELECT *, exploding CTEs, or missing partition pruning.</td>
+</tr>
+<tr>
+<td>4.4</td>
+<td><code>total_gb_spilled_local BETWEEN 1 AND 50 AND spill_trend = 'Worsening'</code></td>
+<td>Any</td>
+<td>Monitor -- SQL review first</td>
+<td>Moderate local spillage ({total_gb_spilled_local} GB, trending worse). Profile the top spilling queries before scaling -- a SQL fix (adding filters, reducing join width) is cheaper than a permanent size increase.</td>
+</tr>
+<tr>
+<td>4.5</td>
+<td><code>total_gb_spilled_local BETWEEN 1 AND 50 AND spill_trend != 'Worsening'</code></td>
+<td>Any</td>
+<td>Stable -- no action</td>
+<td>Minor local spillage ({total_gb_spilled_local} GB, trend stable). Local SSD spill has minimal performance impact at this volume. Continue monitoring.</td>
+</tr>
+<tr>
+<td>4.6</td>
+<td><code>is_snowpark_optimized = FALSE AND spillage is from Snowpark/Python UDFs</code></td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_TYPE = 'SNOWPARK-OPTIMIZED';</code></td>
+<td>Spillage appears driven by Snowpark/Python workloads. Snowpark-optimized warehouses provide 16x memory per node for in-memory processing. (Note: higher credit rate -- 1.5x)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>How each tier reaches the gold layer.</strong> <code>fct_snowflake__warehouse_performance_recommendations</code> outputs the tier as <code>recommendation_key</code> (Enterprise only; null on Standard). <code>int_snowflake__all_recommendations</code> maps from that key, never from the recommendation text:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th><code>recommendation_key</code></th>
+<th>signal_id</th>
+<th>effort_category</th>
+<th>backlog_status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.1</td>
+<td><code>remote_spill</code></td>
+<td><code>spillage_scale_up</code></td>
+<td>config_change</td>
+<td>actionable</td>
+</tr>
+<tr>
+<td>4.2</td>
+<td><code>local_heavy_small_wh</code></td>
+<td><code>spillage_scale_up</code></td>
+<td>config_change</td>
+<td>actionable</td>
+</tr>
+<tr>
+<td>4.3</td>
+<td><code>local_heavy_large_wh</code></td>
+<td><code>spillage_sql_refactor</code></td>
+<td>sql_refactor</td>
+<td>actionable</td>
+</tr>
+<tr>
+<td>4.4</td>
+<td><code>local_moderate_worsening</code></td>
+<td><code>spillage_moderate_worsening</code></td>
+<td>investigation</td>
+<td>monitor</td>
+</tr>
+<tr>
+<td>4.5</td>
+<td><code>local_moderate_stable</code></td>
+<td><code>spillage_moderate_stable</code></td>
+<td>investigation</td>
+<td>monitor</td>
+</tr>
+<tr>
+<td>—</td>
+<td><code>local_minor</code></td>
+<td><code>spillage_moderate_stable</code></td>
+<td>config_change</td>
+<td>stable</td>
+</tr>
+</tbody>
+</table>
+<p>A row whose estimated savings fall below the savings floor is shown as <code>stable</code>, whatever its tier.</p>
+<hr />
+<h2 id="5-oversized-warehouse-priority-medium-cost-savings-opportunity">5. OVERSIZED WAREHOUSE (Priority: Medium -- cost savings opportunity)<a class="headerlink" href="#5-oversized-warehouse-priority-medium-cost-savings-opportunity" title="Permanent link">#</a></h2>
+<p><strong>Signal:</strong> <code>avg_query_load_pct &lt; 50 AND median_execution_ms &lt; 500 AND overload_to_elapsed_ratio &lt; 0.01</code></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Config Check</th>
+<th>Edition Constraint</th>
+<th>Recommendation (DDL)</th>
+<th>Recommendation Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5.1</td>
+<td><code>is_multicluster = TRUE AND max_cluster_count &gt; 1 AND avg_query_load_pct &lt; 30</code></td>
+<td>Enterprise+</td>
+<td><code>ALTER WAREHOUSE {wh} SET MAX_CLUSTER_COUNT = 1;</code></td>
+<td>Warehouse is oversized -- running at {avg_query_load_pct}% avg load with negligible queuing. Multi-cluster is unnecessary at this concurrency level. Switching to single-cluster saves the MCW overhead and simplifies cost attribution.</td>
+</tr>
+<tr>
+<td>5.2</td>
+<td><code>is_multicluster = FALSE AND warehouse_size != 'XSMALL' AND median_execution_ms &lt; 200</code></td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_SIZE = '{next_size_down}';</code></td>
+<td>Warehouse is oversized -- median query execution is {median_execution_ms}ms with only {avg_query_load_pct}% load. Scaling down from {current_size} to {next_size_down} halves credit consumption with minimal performance impact.</td>
+</tr>
+<tr>
+<td>5.3</td>
+<td><code>is_multicluster = FALSE AND warehouse_size = 'XSMALL'</code></td>
+<td>Any</td>
+<td>Stable -- already at minimum</td>
+<td>Warehouse is at minimum size (X-Small). Load is low ({avg_query_load_pct}%) -- consider consolidating this warehouse's workloads into another warehouse if feasible.</td>
+</tr>
+<tr>
+<td>5.4</td>
+<td>Oversized BUT <code>dml_pct &gt; 20</code> AND heavy writes</td>
+<td>Any</td>
+<td>Monitor -- do not scale down</td>
+<td>Warehouse appears oversized by query metrics but has significant DML load ({dml_pct}%). Write-heavy workloads benefit from larger warehouse sizes for COPY/INSERT performance even when concurrency metrics are low.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-expensive-query-cost-growth-priority-medium-creeping-cost">6. EXPENSIVE QUERY COST GROWTH (Priority: Medium -- creeping cost)<a class="headerlink" href="#6-expensive-query-cost-growth-priority-medium-creeping-cost" title="Permanent link">#</a></h2>
+<p><strong>Signal:</strong> <code>cost_trend = 'Worsening' AND estimated_annual_cost_usd &gt; threshold</code></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Config Check</th>
+<th>Edition Constraint</th>
+<th>Recommendation (DDL)</th>
+<th>Recommendation Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6.1</td>
+<td>Query runs many times/day AND avg_elapsed_sec &lt; 10</td>
+<td>Any</td>
+<td>No DDL -- scheduling/consolidation recommended</td>
+<td>Query {node_id} runs {total_runs_30d} times at ${estimated_annual_cost_usd}/yr (trending worse). Execution is fast ({avg_elapsed_sec}s) -- cost is driven by frequency. Consider: reducing run frequency, combining with other models in a single dbt run, or implementing incremental materialization.</td>
+</tr>
+<tr>
+<td>6.2</td>
+<td>Query runs few times AND avg_elapsed_sec &gt; 60 AND spillage on same WH</td>
+<td>Any</td>
+<td><code>ALTER WAREHOUSE {wh} SET WAREHOUSE_SIZE = '{next_size_up}';</code></td>
+<td>Query {node_id} costs ${estimated_annual_cost_usd}/yr with avg runtime {avg_elapsed_sec}s. This warehouse also shows spillage -- a size increase will both reduce execution time (halving credits per run) and eliminate spill overhead. Net cost may decrease despite higher per-hour rate.</td>
+</tr>
+<tr>
+<td>6.3</td>
+<td>Query runs few times AND avg_elapsed_sec &gt; 60 AND no spillage</td>
+<td>Any</td>
+<td>No DDL -- SQL optimization recommended</td>
+<td>Query {node_id} costs ${estimated_annual_cost_usd}/yr with avg runtime {avg_elapsed_sec}s (trending worse). No spillage detected -- long runtime is likely due to full table scans, missing clustering keys, or unoptimized joins. Profile the query plan.</td>
+</tr>
+<tr>
+<td>6.4</td>
+<td><code>is_gen2 = FALSE</code> AND query is compute-bound</td>
+<td>Any</td>
+<td>Consider Gen2 migration</td>
+<td>Query {node_id} costs ${estimated_annual_cost_usd}/yr. Warehouse is Gen1 -- Gen2 warehouses offer improved query performance at the same credit rate. Benchmark this workload on Gen2.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-stable-no-action">7. STABLE / NO ACTION<a class="headerlink" href="#7-stable-no-action" title="Permanent link">#</a></h2>
+<p><strong>Signal:</strong> None of the above thresholds are breached</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Config Check</th>
+<th>Recommendation</th>
+<th>Recommendation Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7.1</td>
+<td>All metrics within healthy ranges</td>
+<td>Stable -- no sizing change recommended</td>
+<td>Metrics within healthy ranges over the last 30 days. idle_credit_pct={x}%, overload_ratio={y}, provisioning_ms={z}, spillage={w}GB. Continue monitoring.</td>
+</tr>
+<tr>
+<td>7.2</td>
+<td>Metrics borderline (e.g., idle 15-20%)</td>
+<td>Monitor -- approaching threshold</td>
+<td>One or more metrics are approaching action thresholds: {list}. No action required yet but schedule a review in 2 weeks.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="additional-signals-not-currently-measured-to-add">Additional Signals NOT Currently Measured (to add)<a class="headerlink" href="#additional-signals-not-currently-measured-to-add" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Source</th>
+<th>What It Enables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>queued_overload_time</code> (per query, aggregated)</td>
+<td>SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY</td>
+<td>More granular overload detection -- can identify specific time-of-day or user patterns</td>
+</tr>
+<tr>
+<td><code>queued_provisioning_time</code> (per query, aggregated)</td>
+<td>SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY</td>
+<td>Distinguish between cold-start types (full suspend vs cluster add)</td>
+</tr>
+<tr>
+<td><code>avg_running</code> / <code>avg_queued_load</code></td>
+<td>SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_LOAD_HISTORY</td>
+<td>Time-series view of warehouse saturation -- enables "peak hour" recommendations</td>
+</tr>
+<tr>
+<td><code>snowflake_edition</code></td>
+<td>SHOW ORGANIZATION ACCOUNTS or param check</td>
+<td>Gate MCW recommendations (critical for Standard edition accounts)</td>
+</tr>
+<tr>
+<td><code>resume_count</code> / <code>suspend_count</code> (per day)</td>
+<td><code>INT_SNOWFLAKE__WAREHOUSE_SUSPEND_CYCLES</code> (derived from WAREHOUSE_EVENTS_HISTORY)</td>
+<td><strong>Now measured.</strong> Quantifies cold-start frequency for provisioning recs and data-driven idle credit savings</td>
+</tr>
+<tr>
+<td><code>cluster_utilization</code> (per cluster in MCW)</td>
+<td>WAREHOUSE_LOAD_HISTORY broken by interval</td>
+<td>Detect if MCW is spinning clusters that sit idle (scaling_policy tuning)</td>
+</tr>
+<tr>
+<td><code>query_acceleration_eligible</code></td>
+<td>QUERY_HISTORY.QUERY_ACCELERATION_MAX_SCALE_FACTOR</td>
+<td>Recommend Query Acceleration Service instead of size-up for long-tail queries</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="size-ladder-reference-for-ddl-generation">Size Ladder Reference (for DDL generation)<a class="headerlink" href="#size-ladder-reference-for-ddl-generation" title="Permanent link">#</a></h2>
+<p>Snowflake uses two size formats depending on the source:</p>
+<table>
+<thead>
+<tr>
+<th>Size</th>
+<th>SHOW WAREHOUSES (title case)</th>
+<th>WAREHOUSE_EVENTS_HISTORY (uppercase)</th>
+<th>Credits/hr</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>X-Small</td>
+<td>XSMALL</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Small</td>
+<td>SMALL</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Medium</td>
+<td>MEDIUM</td>
+<td>4</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Large</td>
+<td>LARGE</td>
+<td>8</td>
+</tr>
+<tr>
+<td>5</td>
+<td>X-Large</td>
+<td>XLARGE</td>
+<td>16</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2X-Large</td>
+<td>XXLARGE</td>
+<td>32</td>
+</tr>
+<tr>
+<td>7</td>
+<td>3X-Large</td>
+<td>XXXLARGE</td>
+<td>64</td>
+</tr>
+<tr>
+<td>8</td>
+<td>4X-Large</td>
+<td>X4LARGE</td>
+<td>128</td>
+</tr>
+<tr>
+<td>9</td>
+<td>5X-Large</td>
+<td>X5LARGE</td>
+<td>256</td>
+</tr>
+<tr>
+<td>10</td>
+<td>6X-Large</td>
+<td>X6LARGE</td>
+<td>512</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>next_warehouse_size</code> macro (in <code>macros/platforms/snowflake/utils/</code>) handles both formats by lowercasing before comparison. It returns null at ladder boundaries (top for up, bottom for down) so concatenated DDL safely nulls out rather than generating incorrect SQL.</p>
+<p>The <code>warehouse_credits_per_hour</code> macro (same directory) maps a size column to the Credits/hr rate in this table. Used by <code>int_snowflake__all_recommendations</code> for forward-looking cost and savings estimates. Returns null for unknown sizes; callers coalesce to 1 (X-Small fallback).</p>
+<p>Next-size-up/down logic should clamp at boundaries and account for credit doubling when calculating cost impact in the recommendation reason.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../optimization_priorities_mapping/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Optimization priorities">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Optimization priorities
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../incremental_recommendations_mapping/" class="md-footer__link md-footer__link--next" aria-label="Next: Incremental recommendation mapping">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Incremental recommendation mapping
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.footer", "navigation.instant", "navigation.tracking", "content.action.edit", "content.code.copy", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
