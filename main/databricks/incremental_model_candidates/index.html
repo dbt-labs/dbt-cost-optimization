@@ -1,0 +1,2208 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Find cost optimization opportunities in your dbt project on Snowflake, Databricks, BigQuery and Redshift.">
+      
+      
+      
+        <link rel="canonical" href="https://dbt-labs.github.io/dbt-cost-optimization/main/databricks/incremental_model_candidates/">
+      
+      
+        <link rel="prev" href="../../snowflake/reference/future_optimizations/">
+      
+      
+        <link rel="next" href="../liquid_clustering_candidates/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Incremental model candidates - dbt Cost Optimization Package</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#incremental-model-candidates" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="dbt Cost Optimization Package" class="md-header__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dbt Cost Optimization Package
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Incremental model candidates
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="dbt Cost Optimization Package" class="md-nav__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    dbt Cost Optimization Package
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Snowflake
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick-use commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recommendations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recommendations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/gold_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/warehouse_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table materialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/table_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/ai_cortex_spend_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/optimization_priorities_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization priorities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/warehouse_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/incremental_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../snowflake/reference/future_optimizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipeline Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pipeline Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-query-to-model-attribution-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How query-to-model attribution works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#staging-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staging layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intermediate-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intermediate layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fact model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-convert-table-models-to-incremental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why convert table models to incremental?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Columns
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-is_candidate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding is_candidate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-suggested_incremental_strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding suggested_incremental_strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding suggested_incremental_strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-this-is-harder-than-it-sounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this is harder than it sounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confidence-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confidence levels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-this-cannot-tell-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this cannot tell you
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applying-the-suggestion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Applying the suggestion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sample Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#top-candidates-by-estimated-monthly-savings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top candidates by estimated monthly savings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-table-models-regardless-of-candidate-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All table models regardless of candidate status
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../liquid_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimize_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPTIMIZE candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model_run_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model run summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigQuery (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bigquery/clustering_key_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clustering key candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redshift (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Redshift (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../redshift/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../redshift/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../redshift/materialization-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/dbt-labs/dbt-cost-optimization/edit/main/docs/databricks/incremental_model_candidates.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="incremental-model-candidates">Incremental Model Candidates<a class="headerlink" href="#incremental-model-candidates" title="Permanent link">#</a></h1>
+<p>This document covers the pipeline for identifying dbt models that are materialized as <code>table</code> but scan enough data per run to justify converting to <code>incremental</code> materialization.</p>
+<h2 id="pipeline-overview">Pipeline Overview<a class="headerlink" href="#pipeline-overview" title="Permanent link">#</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Staging                              Intermediate                               Mart
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>───────                              ────────────                               ────
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>stg_databricks__query_history    ──► int_databricks__dbt_model_run_history  ──►
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  (system.query.history)                                                         fct_databricks__
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>stg_databricks__columns          ──► int_databricks__column_cluster_suggestions  incremental_model_
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  (information_schema.columns)   ──►                                             candidates
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                                  int_dbt__relations
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                  int_table_inventory
+</span></code></pre></div>
+<h3 id="how-query-to-model-attribution-works">How query-to-model attribution works<a class="headerlink" href="#how-query-to-model-attribution-works" title="Permanent link">#</a></h3>
+<p>Unlike the table query stats pipeline (which uses fuzzy table name matching), this model uses <strong>exact attribution</strong> via the dbt query comment. Every query dbt runs is prefixed with a JSON comment:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cm">/* {"app": "dbt", "dbt_version": "1.x.x", "node_id": "model.my_project.my_model", ...} */</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="p">...</span>
+</span></code></pre></div>
+<p>The intermediate model extracts <code>node_id</code> from this comment using <code>regexp_extract</code> and joins it directly to <code>int_dbt__relations</code> on the <code>dbt_model</code> (unique_id) field. This means attribution is exact — only queries from the current dbt project are captured, and each query is attributed to the specific model that ran it.</p>
+<h3 id="staging-layer">Staging layer<a class="headerlink" href="#staging-layer" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Source</th>
+<th>Materialization</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stg_databricks__query_history</code></td>
+<td><code>system.query.history</code></td>
+<td>incremental (7-day lookback)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="intermediate-layer">Intermediate layer<a class="headerlink" href="#intermediate-layer" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int_databricks__dbt_model_run_history</code></td>
+<td>Filters query history to dbt-executed queries, extracts <code>node_id</code> from the comment header, and joins to <code>int_dbt__relations</code> to get model name and materialization type. One row per successful dbt model run.</td>
+</tr>
+<tr>
+<td><code>int_dbt__relations</code></td>
+<td>Compile-time mapping from dbt model metadata to physical relation names and materialization types.</td>
+</tr>
+<tr>
+<td><code>int_databricks__column_cluster_suggestions</code></td>
+<td>Scores each table's columns by query filter frequency to suggest the best cluster/filter column. Used here to populate <code>suggested_filter_column</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fact-model">Fact model<a class="headerlink" href="#fact-model" title="Permanent link">#</a></h3>
+<p><strong><code>fct_databricks__incremental_model_candidates</code></strong> aggregates model run history over the lookback window, flags <code>table</code>-materialized models that scan above the threshold as candidates for conversion to <code>incremental</code>, and surfaces copy-pasteable starter code so engineers can act on the recommendation directly.</p>
+<p><strong>Key CTEs in the fact model:</strong></p>
+<table>
+<thead>
+<tr>
+<th>CTE</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model_runs</code></td>
+<td>Aggregates run history from <code>int_databricks__dbt_model_run_history</code> over the lookback window.</td>
+</tr>
+<tr>
+<td><code>table_dml_stats</code></td>
+<td>Sums INSERT/UPDATE/DELETE/MERGE counts from <code>int_databricks__table_query_stats_daily</code> to determine update semantics.</td>
+</tr>
+<tr>
+<td><code>table_clustered</code></td>
+<td>Looks up whether each table already has a cluster key from <code>int_table_inventory</code>.</td>
+</tr>
+<tr>
+<td><code>unique_key_candidates</code> / <code>suggested_unique_keys</code></td>
+<td>Reads <code>stg_databricks__columns</code> and scores column names by pattern. Non-key data types (timestamp, date, float, double, boolean) are excluded before scoring. The top-scoring column per table is surfaced as <code>suggested_unique_key</code>.</td>
+</tr>
+<tr>
+<td><code>filter_column_suggestions</code></td>
+<td>Pulls the top suggested filter/cluster column per table from <code>int_databricks__column_cluster_suggestions</code>.</td>
+</tr>
+<tr>
+<td><code>filter_column_data_types</code></td>
+<td>Joins <code>stg_databricks__columns</code> with the filter column suggestion to retrieve that column's <code>data_type</code> — needed to detect <code>delete+insert</code> candidates and microbatch candidates.</td>
+</tr>
+<tr>
+<td><code>final</code></td>
+<td>Joins all of the above, computes scores, flags candidates, and derives <code>suggested_incremental_strategy</code>.</td>
+</tr>
+<tr>
+<td><code>final_with_templates</code></td>
+<td>Wraps <code>final</code> to add six template string columns (<code>recommendation_reason</code>, <code>strategy_notes</code>, <code>validate_uniqueness_sql</code>, <code>incremental_filter_template</code>, <code>updated_model_config</code>, <code>microbatch_config_template</code>) that produce copy-pasteable dbt code.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="why-convert-table-models-to-incremental">Why convert <code>table</code> models to <code>incremental</code>?<a class="headerlink" href="#why-convert-table-models-to-incremental" title="Permanent link">#</a></h2>
+<p>A <code>table</code> materialized dbt model performs a full refresh on every run — it reads all source data, transforms it, and rewrites the entire output table. For models that process large historical datasets but only receive new rows over time, this is wasteful: 99% of the data is unchanged, but 100% of it is scanned and rewritten each run.</p>
+<p>An <code>incremental</code> model instead processes only rows that are new or changed since the last run. For a model that runs daily on a 2-year dataset, converting from <code>table</code> to <code>incremental</code> can reduce bytes scanned by 99%+ and cut runtime from minutes to seconds.</p>
+<p><strong>Good candidates for incremental conversion:</strong>
+- Event tables, log tables, or any append-only source
+- Models with a reliable timestamp column that identifies new rows
+- Models that run frequently (daily or more often)
+- Models that scan significantly more data than they produce as new rows</p>
+<p><strong>Poor candidates:</strong>
+- Models that perform complex historical recalculations (SCD Type 2, rolling windows)
+- Models where source data is regularly updated or deleted
+- Small models where the overhead of incremental logic outweighs the benefit</p>
+<hr />
+<h2 id="project-variables">Project Variables<a class="headerlink" href="#project-variables" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>incremental_candidates_lookback_days</code></td>
+<td><code>60</code></td>
+<td>Number of days of run history to analyze.</td>
+</tr>
+<tr>
+<td><code>incremental_candidates_min_avg_bytes_scanned_gb</code></td>
+<td><code>0.1</code></td>
+<td>Minimum average bytes scanned per run (in GB) to flag as a candidate. Models below this threshold are too small to benefit meaningfully from incremental conversion.</td>
+</tr>
+<tr>
+<td><code>incremental_candidates_min_run_count</code></td>
+<td><code>3</code></td>
+<td>Minimum number of runs within the lookback window required to flag as a candidate. Requires enough runs to establish a reliable pattern.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuration">Example configuration<a class="headerlink" href="#example-configuration" title="Permanent link">#</a></h3>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># vars.yml</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">vars</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1"># Widen the analysis window</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">incremental_candidates_lookback_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">14</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="c1"># Lower threshold for smaller projects</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">incremental_candidates_min_avg_bytes_scanned_gb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+</span></code></pre></div>
+<hr />
+<h2 id="output-columns">Output Columns<a class="headerlink" href="#output-columns" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>snapshot_date</code></td>
+<td>Date of the snapshot (one per day)</td>
+</tr>
+<tr>
+<td><code>dbt_model</code></td>
+<td>dbt <code>unique_id</code> (e.g. <code>model.my_project.my_model</code>)</td>
+</tr>
+<tr>
+<td><code>model_name</code></td>
+<td>Short model name</td>
+</tr>
+<tr>
+<td><code>materialized</code></td>
+<td>Current materialization: <code>table</code>, <code>view</code>, or <code>incremental</code></td>
+</tr>
+<tr>
+<td><code>table_fqn</code></td>
+<td>Fully qualified table name (<code>catalog.schema.table</code>)</td>
+</tr>
+<tr>
+<td><code>database_name</code></td>
+<td>Catalog</td>
+</tr>
+<tr>
+<td><code>schema_name</code></td>
+<td>Schema</td>
+</tr>
+<tr>
+<td><code>table_name</code></td>
+<td>Table name</td>
+</tr>
+<tr>
+<td><code>run_count</code></td>
+<td>Number of successful runs in the lookback window</td>
+</tr>
+<tr>
+<td><code>total_bytes_scanned_gb</code></td>
+<td>Total bytes scanned across all runs in the lookback window</td>
+</tr>
+<tr>
+<td><code>avg_bytes_scanned_gb</code></td>
+<td>Average bytes scanned per run</td>
+</tr>
+<tr>
+<td><code>total_execution_time_s</code></td>
+<td>Total execution time across all runs in seconds</td>
+</tr>
+<tr>
+<td><code>avg_execution_time_s</code></td>
+<td>Average execution time per run in seconds</td>
+</tr>
+<tr>
+<td><code>estimated_monthly_runs</code></td>
+<td>Extrapolated monthly run count based on the lookback window</td>
+</tr>
+<tr>
+<td><code>estimated_monthly_bytes_scanned_gb</code></td>
+<td>Extrapolated monthly bytes scanned if the model stays as <code>table</code></td>
+</tr>
+<tr>
+<td><code>score</code></td>
+<td><code>avg_bytes_scanned_gb × run_count</code> — higher means more total data could be saved by converting</td>
+</tr>
+<tr>
+<td><code>is_candidate</code></td>
+<td><code>true</code> when materialized = <code>table</code>, avg bytes ≥ threshold, and run count ≥ minimum</td>
+</tr>
+<tr>
+<td><code>insert_count</code></td>
+<td>Number of INSERT statements observed against this table in the lookback window</td>
+</tr>
+<tr>
+<td><code>update_count</code></td>
+<td>Number of UPDATE statements observed against this table in the lookback window</td>
+</tr>
+<tr>
+<td><code>delete_count</code></td>
+<td>Number of DELETE statements observed against this table in the lookback window</td>
+</tr>
+<tr>
+<td><code>merge_count</code></td>
+<td>Number of MERGE statements observed against this table in the lookback window</td>
+</tr>
+<tr>
+<td><code>suggested_incremental_strategy</code></td>
+<td>Recommended dbt incremental strategy based on DML history: <code>merge</code>, <code>append</code>, or <code>insert_overwrite</code></td>
+</tr>
+<tr>
+<td><code>suggested_incremental_strategy_confidence</code></td>
+<td><code>HIGH</code>, <code>MEDIUM</code>, or <code>LOW</code> — how confident the suggestion is (see below)</td>
+</tr>
+<tr>
+<td><code>first_seen</code></td>
+<td>Earliest run timestamp in the lookback window</td>
+</tr>
+<tr>
+<td><code>last_seen</code></td>
+<td>Most recent run timestamp in the lookback window</td>
+</tr>
+<tr>
+<td><code>suggested_unique_key</code></td>
+<td>Best candidate column name for use as the <code>unique_key</code> in a <code>merge</code> strategy. Columns with non-key data types (timestamp, date, float, double, boolean) are excluded before scoring. Scored by naming pattern: <code>surrogate_key</code>/<code>primary_key</code> exact (score 10) &gt; <code>_id</code> suffix (9) &gt; <code>_sk</code> suffix (8) &gt; <code>id</code> exact (7) &gt; <code>uuid</code>/<code>guid</code> exact (6) &gt; <code>_uuid</code>/<code>_guid</code>/<code>_key</code> suffix (5). <code>null</code> if no qualifying column is found.</td>
+</tr>
+<tr>
+<td><code>suggested_filter_column</code></td>
+<td>Best candidate column for the <code>{% if is_incremental() %}</code> filter predicate, sourced from <code>int_databricks__column_cluster_suggestions</code>. <code>null</code> if no suggestion is available.</td>
+</tr>
+<tr>
+<td><code>suggested_filter_column_confidence</code></td>
+<td>Confidence level for <code>suggested_filter_column</code>, inherited from <code>int_databricks__column_cluster_suggestions</code>.</td>
+</tr>
+<tr>
+<td><code>filter_column_data_type</code></td>
+<td>Data type of <code>suggested_filter_column</code>. Used internally to detect microbatch eligibility; also useful for validating filter syntax.</td>
+</tr>
+<tr>
+<td><code>recommendation_reason</code></td>
+<td>Human-readable summary of why this model is a candidate (e.g. "Avg 1.5 GB scanned per run across 14 runs in the last 7 days — incrementalization would reduce compute cost"). <code>null</code> for non-candidates.</td>
+</tr>
+<tr>
+<td><code>strategy_notes</code></td>
+<td>Human-readable explanation of why the suggested strategy was chosen and what to verify before applying it. Always populated when <code>is_candidate = true</code>.</td>
+</tr>
+<tr>
+<td><code>validate_uniqueness_sql</code></td>
+<td>Copy-pasteable SQL query to verify that <code>suggested_unique_key</code> is actually unique in the target table: <code>select count(*) = count(distinct &lt;key&gt;) as is_unique from &lt;table_fqn&gt;</code>. <code>null</code> if no unique key was suggested. Run this before using the key in a <code>merge</code> config.</td>
+</tr>
+<tr>
+<td><code>incremental_filter_template</code></td>
+<td>Copy-pasteable SQL snippet for the <code>{% if is_incremental() %}</code> filter block, pre-filled with <code>suggested_filter_column</code> and the appropriate predicate for the suggested strategy.</td>
+</tr>
+<tr>
+<td><code>updated_model_config</code></td>
+<td>Copy-pasteable <code>{{ config(...) }}</code> block with <code>materialized='incremental'</code>, <code>incremental_strategy</code>, <code>unique_key</code> (if applicable), and <code>on_schema_change='append_new_columns'</code> pre-filled.</td>
+</tr>
+<tr>
+<td><code>microbatch_config_template</code></td>
+<td>Copy-pasteable microbatch <code>{{ config(...) }}</code> block. Only populated when: strategy is <code>merge</code>, filter column is a timestamp type, and the table is insert-heavy (insert_count &gt; 9× update+merge, or zero updates). <code>null</code> otherwise.</td>
+</tr>
+<tr>
+<td><code>downstream_model_count</code></td>
+<td>Number of dbt models that directly depend on this model, from <code>int_dbt__relations</code>. Useful for prioritizing conversions — high downstream count means more models benefit from faster runtime.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="understanding-is_candidate">Understanding <code>is_candidate</code><a class="headerlink" href="#understanding-is_candidate" title="Permanent link">#</a></h2>
+<p>A model is flagged as <code>is_candidate = true</code> when <strong>all three</strong> conditions are met:</p>
+<ol>
+<li>
+<p><strong>It is a <code>table</code> materialization.</strong> <code>incremental</code> models are already processing only new data. <code>view</code> models don't scan data at dbt run time — they execute at query time — so they are not flagged here.</p>
+</li>
+<li>
+<p><strong>It scans enough data per run.</strong> <code>avg_bytes_scanned_gb &gt;= incremental_candidates_min_avg_bytes_scanned_gb</code> — models below the threshold are too small to justify the added complexity of incremental logic.</p>
+</li>
+<li>
+<p><strong>It runs frequently enough to establish a pattern.</strong> <code>run_count &gt;= incremental_candidates_min_run_count</code> — a model that ran once in the lookback window may be a one-off or a rare full refresh, not a regular scheduled run.</p>
+</li>
+</ol>
+<hr />
+<h2 id="understanding-suggested_incremental_strategy">Understanding <code>suggested_incremental_strategy</code><a class="headerlink" href="#understanding-suggested_incremental_strategy" title="Permanent link">#</a></h2>
+<h3 id="why-this-is-harder-than-it-sounds">Why this is harder than it sounds<a class="headerlink" href="#why-this-is-harder-than-it-sounds" title="Permanent link">#</a></h3>
+<p>Choosing the right incremental strategy requires knowing the <em>update semantics</em> of your data — whether rows are ever modified after insertion, whether records can be deleted, and whether there is a reliable unique key. These are application-level facts that no data platform exposes directly in system tables.</p>
+<p>To approximate this, the model uses <strong>DML type breakdown</strong> from <code>system.query.history</code>. Databricks records the <code>statement_type</code> of every query (<code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>MERGE</code>), which gives us a signal about how data actually flows into each table. This is the same approach taken in the Snowflake version of this package.</p>
+<p><strong>Important attribution note:</strong> DML counts use the same fuzzy text-matching approach as the table query stats pipeline (<code>query_text ilike '%table_name%'</code>). This means DML from <em>any</em> source is captured — dbt runs, Spark jobs, manual SQL, external pipelines. That breadth is intentional: if something outside dbt is updating this table, that's important signal for choosing a strategy. But it also means the counts can include false positives if a table name is a common substring.</p>
+<h3 id="decision-matrix">Decision matrix<a class="headerlink" href="#decision-matrix" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Suggested strategy</th>
+<th>Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>update_count &gt; 0</code> or <code>merge_count &gt; 0</code></td>
+<td><code>merge</code></td>
+<td><code>HIGH</code> — rows are definitively mutable; append would lose updates</td>
+</tr>
+<tr>
+<td><code>delete_count &gt; 0</code>, no updates or merges</td>
+<td><code>merge</code></td>
+<td><code>MEDIUM</code> — deletions require handling; merge covers this safely</td>
+</tr>
+<tr>
+<td>Only inserts, table has a partition/cluster column</td>
+<td><code>insert_overwrite</code></td>
+<td><code>LOW</code> — pattern suggests partition-aligned writes, but not confirmed</td>
+</tr>
+<tr>
+<td>Only inserts, no cluster column, filter column is a date/timestamp type</td>
+<td><code>delete+insert</code></td>
+<td><code>LOW</code> — partition-range rewrite is cheaper than row-level merge for high-volume tables; requires a reliable filter column to bound the delete window</td>
+</tr>
+<tr>
+<td>Only inserts, no cluster column, no timestamp filter column</td>
+<td><code>append</code></td>
+<td><code>LOW</code> — likely immutable, but cannot be confirmed from system tables alone</td>
+</tr>
+<tr>
+<td>No DML history in lookback window</td>
+<td><code>merge</code></td>
+<td><code>LOW</code> — safest default when no signal exists</td>
+</tr>
+</tbody>
+</table>
+<h3 id="confidence-levels">Confidence levels<a class="headerlink" href="#confidence-levels" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HIGH</code></td>
+<td>UPDATE or MERGE statements observed — rows are definitely mutable. <code>merge</code> is the correct strategy.</td>
+</tr>
+<tr>
+<td><code>MEDIUM</code></td>
+<td>DELETE statements observed with no updates — rows may be deleted but not modified. <code>merge</code> is still the safe choice.</td>
+</tr>
+<tr>
+<td><code>LOW</code></td>
+<td>Only inserts observed, or no DML history at all. The suggestion is a reasonable starting point but requires validation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-this-cannot-tell-you">What this cannot tell you<a class="headerlink" href="#what-this-cannot-tell-you" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Whether <code>suggested_unique_key</code> is actually unique.</strong> The model scores columns by name pattern but cannot verify uniqueness from system tables. Use the <code>validate_uniqueness_sql</code> column to run a quick check before applying the suggestion.</li>
+<li><strong>Whether <code>append</code> is truly safe.</strong> Even if no UPDATE statements are observed in the lookback window, out-of-band corrections or delayed reprocessing jobs could invalidate the append assumption. Always confirm with the team that owns the source data.</li>
+<li><strong>The right predicate for <code>insert_overwrite</code>.</strong> If you use <code>insert_overwrite</code>, dbt needs to know which partition(s) to replace. Review the <code>suggested_cluster_key</code> in <code>fct_databricks__liquid_clustering_candidates</code> for guidance on which column is most commonly filtered.</li>
+<li><strong>The right lookback window for <code>delete+insert</code>.</strong> The template defaults to <code>INTERVAL 3 DAYS</code> as a conservative starting point. The correct window depends on your data's latency and reprocessing patterns — too narrow and late-arriving rows will be missed; too wide and you're scanning more than necessary.</li>
+<li><strong>Whether the microbatch template is the right final config.</strong> <code>microbatch_config_template</code> is only surfaced when conditions strongly suggest it (timestamp filter column + insert-heavy pattern), but you should verify the <code>event_time</code> column truly represents event time and set a realistic <code>begin</code> date before using it.</li>
+</ul>
+<h3 id="applying-the-suggestion">Applying the suggestion<a class="headerlink" href="#applying-the-suggestion" title="Permanent link">#</a></h3>
+<p>The fact model surfaces four template columns that produce copy-pasteable dbt starter code. Retrieve them for a specific model and paste the output directly into your <code>.sql</code> file:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Get copy-pasteable starter code for a specific model</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">select</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">table_fqn</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="n">recommendation_reason</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="n">strategy_notes</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="n">suggested_incremental_strategy</span><span class="p">,</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">suggested_incremental_strategy_confidence</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">suggested_unique_key</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="n">validate_uniqueness_sql</span><span class="p">,</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="n">suggested_filter_column</span><span class="p">,</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="n">incremental_filter_template</span><span class="p">,</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="n">updated_model_config</span><span class="p">,</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="n">microbatch_config_template</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_databricks__incremental_model_candidates</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="k">where</span><span class="w"> </span><span class="n">snapshot_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">current_date</span><span class="p">()</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">is_candidate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">score</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<p><code>updated_model_config</code> contains a ready-to-use <code>{{ config(...) }}</code> block, and <code>incremental_filter_template</code> contains the corresponding <code>{% if is_incremental() %}</code> WHERE clause. For example, a merge candidate with <code>suggested_unique_key = 'event_id'</code> and <code>suggested_filter_column = 'created_at'</code> would produce:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- updated_model_config:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="err">{{</span><span class="w"> </span><span class="n">config</span><span class="p">(</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">materialized</span><span class="o">=</span><span class="s1">'incremental'</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">incremental_strategy</span><span class="o">=</span><span class="s1">'merge'</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">unique_key</span><span class="o">=</span><span class="s1">'event_id'</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">on_schema_change</span><span class="o">=</span><span class="s1">'append_new_columns'</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span><span class="w"> </span><span class="err">}}</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1">-- incremental_filter_template (add this to the end of your model's WHERE clause):</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="err">{</span><span class="o">%</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">is_incremental</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="err">}</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="k">where</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">        </span><span class="k">select</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">created_at</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">DAY</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">        </span><span class="k">from</span><span class="w"> </span><span class="err">{{</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="err">}}</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="p">)</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="err">{</span><span class="o">%</span><span class="w"> </span><span class="n">endif</span><span class="w"> </span><span class="o">%</span><span class="err">}</span>
+</span></code></pre></div>
+<p>If <code>microbatch_config_template</code> is non-null, it means the table pattern (insert-heavy + timestamp filter column) is consistent with microbatch. Review the template and set the <code>begin</code> date before using it.</p>
+<hr />
+<h2 id="sample-queries">Sample Queries<a class="headerlink" href="#sample-queries" title="Permanent link">#</a></h2>
+<h3 id="top-candidates-by-estimated-monthly-savings">Top candidates by estimated monthly savings<a class="headerlink" href="#top-candidates-by-estimated-monthly-savings" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">select</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">table_fqn</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">run_count</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">avg_bytes_scanned_gb</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">avg_execution_time_s</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="n">estimated_monthly_runs</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">estimated_monthly_bytes_scanned_gb</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="n">score</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="n">is_candidate</span><span class="p">,</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="n">recommendation_reason</span><span class="p">,</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="n">suggested_incremental_strategy</span><span class="p">,</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="n">suggested_unique_key</span><span class="p">,</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="n">suggested_filter_column</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_databricks__incremental_model_candidates</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="k">where</span><span class="w"> </span><span class="n">snapshot_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">current_date</span><span class="p">()</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">estimated_monthly_bytes_scanned_gb</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="all-table-models-regardless-of-candidate-status">All table models regardless of candidate status<a class="headerlink" href="#all-table-models-regardless-of-candidate-status" title="Permanent link">#</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">select</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">model_name</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">materialized</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="n">run_count</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="n">avg_bytes_scanned_gb</span><span class="p">,</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">avg_execution_time_s</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">is_candidate</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">from</span><span class="w"> </span><span class="o">&lt;</span><span class="n">your_catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">your_schema</span><span class="o">&gt;</span><span class="p">.</span><span class="n">fct_databricks__incremental_model_candidates</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="k">where</span><span class="w"> </span><span class="n">snapshot_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">current_date</span><span class="p">()</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">materialized</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'table'</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">avg_bytes_scanned_gb</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Only current project models are captured.</strong> Attribution relies on the <code>node_id</code> in the dbt query comment, which is scoped to the project running the pipeline. Queries from other dbt projects or ad-hoc SQL are excluded.</li>
+<li><strong><code>statement_text</code> must be populated.</strong> If your workspace uses customer-managed keys, query text is redacted and this pipeline will return no rows. Check with your workspace admin.</li>
+<li><strong>Views are excluded.</strong> dbt creates views with a fast DDL statement that scans near-zero bytes. View query costs are incurred at query time, not at dbt run time, and are outside the scope of this model.</li>
+<li><strong>Incremental conversion requires a reliable incremental key.</strong> Before converting a model, confirm the source has a timestamp or ID column that reliably identifies new rows. Without a good incremental key, the model may miss updates or require frequent full refreshes anyway.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../snowflake/reference/future_optimizations/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Future optimizations">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Future optimizations
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../liquid_clustering_candidates/" class="md-footer__link md-footer__link--next" aria-label="Next: Liquid clustering candidates">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Liquid clustering candidates
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.footer", "navigation.instant", "navigation.tracking", "content.action.edit", "content.code.copy", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

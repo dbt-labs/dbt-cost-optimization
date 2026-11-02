@@ -1,0 +1,1899 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Find cost optimization opportunities in your dbt project on Snowflake, Databricks, BigQuery and Redshift.">
+      
+      
+      
+        <link rel="canonical" href="https://dbt-labs.github.io/dbt-cost-optimization/main/testing/">
+      
+      
+        <link rel="prev" href="../redshift/materialization-strategy/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Testing - dbt Cost Optimization Package</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testing-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="dbt Cost Optimization Package" class="md-header__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            dbt Cost Optimization Package
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Testing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="dbt Cost Optimization Package" class="md-nav__button md-logo" aria-label="dbt Cost Optimization Package" data-md-component="logo">
+      
+  <img src="../assets/dbt-logo.svg" alt="logo">
+
+    </a>
+    dbt Cost Optimization Package
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbt-labs/dbt-cost-optimization" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dbt-labs/dbt-cost-optimization
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Snowflake
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick-use commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recommendations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recommendations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/gold_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gold layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/warehouse_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table materialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/table_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Table clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/ai_cortex_spend_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI and Cortex spend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/optimization_priorities_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization priorities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/warehouse_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warehouse recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/incremental_recommendations_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental recommendation mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snowflake/reference/future_optimizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../databricks/incremental_model_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental model candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../databricks/liquid_clustering_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liquid clustering candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../databricks/optimize_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPTIMIZE candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../databricks/model_run_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model run summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigQuery (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bigquery/clustering_key_candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clustering key candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redshift (beta)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Redshift (beta)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../redshift/materialization_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../redshift/incremental_config_recommendations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental config recommendations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../redshift/materialization-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Materialization strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-each-kind-of-test-proves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What each kind of test proves
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-running-the-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Running the tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Running the tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-tests-in-a-project-that-installs-the-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data tests: in a project that installs the package
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unit-and-macro-tests-from-this-repo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit and macro tests: from this repo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests-snowflake-from-this-repo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration tests (Snowflake): from this repo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smoke-test-snowflake-against-the-real-account_usage-views" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Smoke test (Snowflake): against the real ACCOUNT_USAGE views
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-expected-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Expected results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-writing-new-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Writing new tests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-not-covered-by-automated-tests-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Not covered by automated tests yet
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Not covered by automated tests yet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manual-checklist-hooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual checklist: hooks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-checklist-run-operation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual checklist: run-operation commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/dbt-labs/dbt-cost-optimization/edit/main/docs/testing.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="testing-guide">Testing guide<a class="headerlink" href="#testing-guide" title="Permanent link">#</a></h1>
+<p>How this package is tested, how to run the tests, and what the results should look like.</p>
+<p><strong>Scope today:</strong> Snowflake, on dbt v2 (this branch, <code>main</code>). The same suites run on dbt v1 from the <code>main-v1</code> branch, whose TESTING.md has the dbt v1 commands. The Databricks, BigQuery, and Redshift models are in beta and have their own data tests. Their unit tests are planned.</p>
+<hr />
+<h2 id="1-what-each-kind-of-test-proves">1. What each kind of test proves<a class="headerlink" href="#1-what-each-kind-of-test-proves" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Test type</th>
+<th>Count</th>
+<th>What it proves</th>
+<th>Needs real account data?</th>
+<th>Where it lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Data tests</strong></td>
+<td>56 on Snowflake marts, 2 on <code>int_snowflake__clustering_key_summary</code>, plus 3 on shared models and 1 savings check on the recommendation backlog (warns)</td>
+<td>The <strong>real output</strong> has no null keys, and category columns only contain expected values</td>
+<td><strong>Yes.</strong> Run after building the models in a real project.</td>
+<td><code>data_tests:</code> blocks in <code>models/snowflake/marts/**/_*.yml</code>, <code>models/snowflake/intermediate/_snowflake_intermediate.yml</code> and <code>models/shared/_shared.yml</code></td>
+</tr>
+<tr>
+<td><strong>Unit tests</strong></td>
+<td>22</td>
+<td>The <strong>transformation logic</strong> is correct: for given input rows, a model returns exactly the expected output rows</td>
+<td><strong>No.</strong> Inputs are supplied in the test. A warehouse connection is still required. Off by default; see §3.</td>
+<td><code>models/snowflake/marts/gold/_gold__unit_tests.yml</code>, <code>models/snowflake/marts/warehouse/_warehouse__unit_tests.yml</code>, <code>models/snowflake/intermediate/_snowflake_intermediate__unit_tests.yml</code></td>
+</tr>
+<tr>
+<td><strong>Macro tests</strong></td>
+<td>5</td>
+<td>Macros that return values (scores, arrays, generated config text, the scaling-efficiency curve) return exactly what's expected</td>
+<td><strong>No.</strong> A warehouse connection is still required. Off by default; see §3.</td>
+<td><code>tests/snowflake/macros/</code></td>
+</tr>
+<tr>
+<td><strong>Integration tests (Snowflake)</strong></td>
+<td>19 assertions, on Standard and Enterprise edition</td>
+<td>The <strong>whole pipeline</strong>, hooks included, turns known account activity into exactly the expected recommendations, savings, and gold-view rows</td>
+<td><strong>No.</strong> Fixture tables stand in for <code>ACCOUNT_USAGE</code>. Some fixtures run real queries in your account (see §3).</td>
+<td><code>integration_tests/snowflake/</code></td>
+</tr>
+<tr>
+<td><strong>Smoke test (Snowflake)</strong></td>
+<td>every package model and data test, both editions</td>
+<td>Every model compiles and runs against the <strong>real</strong> <code>ACCOUNT_USAGE</code> views' columns and types, on a full refresh and an incremental run</td>
+<td>Reads the real views' structure only (<code>--empty</code>)</td>
+<td>Commands in §3</td>
+</tr>
+</tbody>
+</table>
+<p>What the unit tests cover:</p>
+<ul>
+<li><strong>All 11 Snowflake gold views:</strong> filtering, deduplication, ranking, domain and action mapping, cost aggregation, and credit attribution.</li>
+<li><strong><code>scope_filter</code></strong>, the project-scoping logic behind every gold view. There's one test for each combination of <code>dbt_monitored_projects</code> (<code>[]</code>, a list, <code>['*']</code>) and <code>include_full_platform_insights</code>.</li>
+<li><strong>Regression tests</strong> for bugs found and fixed while writing the tests. Each one fails against the old SQL:</li>
+<li><code>vw_snowflake__warehouse_optimizations</code> labeled mixed actionable/monitor groups <code>monitor</code>.</li>
+<li><code>vw_snowflake__top_queried_models</code> returned no rows with <code>dbt_monitored_projects: ['*']</code>.</li>
+<li><code>vw_snowflake__top_spillage_models</code> duplicated a model that had several spillage signals.</li>
+<li><code>vw_snowflake__user_level_cost_attribution</code> double-counted queries that read several models, and applied one warehouse rate to all of a user's time.</li>
+</ul>
+<p>Every unit test and macro test has been checked to <strong>fail</strong> when the logic it covers is broken, not just to pass. So has every integration assertion: each fix it covers was reverted (a "mutation check") and the assertion failed.</p>
+<hr />
+<h2 id="2-before-you-start">2. Before you start<a class="headerlink" href="#2-before-you-start" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>dbt v2.</strong> This branch is tested on dbt v2. For dbt v1, see the <code>main-v1</code> branch.</li>
+<li><strong>A Snowflake role that can read <code>SNOWFLAKE.ACCOUNT_USAGE</code></strong> (<code>IMPORTED PRIVILEGES</code> on the <code>SNOWFLAKE</code> database), plus a warehouse.</li>
+<li><strong>A dedicated test schema.</strong> Setting up unit tests builds tables (mostly empty) in it. Because the package sets <code>+schema: dbt_cost_optimization</code>, models land in <code>&lt;your target schema&gt;_dbt_cost_optimization</code>.</li>
+<li><strong>A dbt profile target</strong> for this repo's profile, <code>dbt_cost_optimization</code>, in <code>~/.dbt/profiles.yml</code>. Key-pair authentication works well for repeated test runs:</li>
+</ul>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># ~/.dbt/profiles.yml (outside the repo). Placeholder values only.</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">dbt_cost_optimization</span><span class="p">:</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">test</span><span class="p">:</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">snowflake</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;org&gt;-&lt;account&gt;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;username&gt;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;role with ACCOUNT_USAGE access&gt;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">      </span><span class="nt">warehouse</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;warehouse&gt;</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">      </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;database&gt;</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">      </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;test schema&gt;</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">      </span><span class="nt">private_key_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;path to your .p8 key&gt;</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+</span></code></pre></div>
+<blockquote>
+<p><strong>Never commit credentials.</strong> Keep profiles and keys outside the repo. <code>target/</code> and <code>logs/</code> are gitignored because compiled SQL and logs contain database and schema names.</p>
+</blockquote>
+<p>Every command below passes <code>--vars '{dbt_cost_optimization_enabled: true}'</code>, because the package's models are disabled by default. Add <code>--target &lt;your target&gt;</code> if your test target isn't the profile's default.</p>
+<hr />
+<h2 id="3-running-the-tests">3. Running the tests<a class="headerlink" href="#3-running-the-tests" title="Permanent link">#</a></h2>
+<h3 id="data-tests-in-a-project-that-installs-the-package">Data tests: in a project that installs the package<a class="headerlink" href="#data-tests-in-a-project-that-installs-the-package" title="Permanent link">#</a></h3>
+<p>Data tests check real output, so run them where the package analyzes real activity: in a dbt project that installs this package and has models with query history.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization<span class="w"> </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true}'</span>
+</span></code></pre></div>
+<p>To run only the tests against models you've already built:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dbt<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization,test_type:data<span class="w"> </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true}'</span>
+</span></code></pre></div>
+<h3 id="unit-and-macro-tests-from-this-repo">Unit and macro tests: from this repo<a class="headerlink" href="#unit-and-macro-tests-from-this-repo" title="Permanent link">#</a></h3>
+<p>Unit tests read the <strong>column types</strong> of each tested model's parents from the warehouse, so the parents have to exist first. They can be empty. This is a one-time setup per test schema, and you only need to repeat it when a parent model's columns change.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># 1. Build everything the gold views depend on as empty tables, except the two models</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1">#    below and anything downstream of them.</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>dbt<span class="w"> </span>run<span class="w"> </span>--select<span class="w"> </span>+tag:gold<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>--exclude<span class="w"> </span>int_snowflake__warehouse_config+<span class="w"> </span>fct_snowflake__table_clustering_candidates+<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span>--empty<span class="w"> </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true}'</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># 2. Build those two models normally. Their inputs are empty, so this is quick.</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>dbt<span class="w"> </span>run<span class="w"> </span>--select<span class="w"> </span>int_snowflake__warehouse_config<span class="w"> </span>fct_snowflake__table_clustering_candidates<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true}'</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># 3. Build everything else as empty tables.</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>dbt<span class="w"> </span>run<span class="w"> </span>--select<span class="w"> </span>+tag:gold<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span>--exclude<span class="w"> </span>int_snowflake__warehouse_config<span class="w"> </span>fct_snowflake__table_clustering_candidates<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span>--empty<span class="w"> </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true}'</span>
+</span></code></pre></div>
+<blockquote>
+<p><strong>Why two models are built normally:</strong> <code>--empty</code> rewrites every <code>ref()</code> as <code>(select * from … where false limit 0)</code>. That works in a model's <code>select</code>, but not in post-hooks that write to a table, which these two models have (<code>refresh_warehouse_config</code>, <code>extract_operator_evidence</code>, <code>refresh_column_cardinality</code>). Building them normally on top of empty inputs avoids the problem.</p>
+</blockquote>
+<p>Then run the tests:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dbt<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--select<span class="w"> </span>test_type:unit<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true, dbt_cost_optimization_run_package_tests: true}'</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>dbt<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--select<span class="w"> </span>tag:macro_tests<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--vars<span class="w"> </span><span class="s1">'{dbt_cost_optimization_enabled: true, dbt_cost_optimization_run_package_tests: true}'</span>
+</span></code></pre></div>
+<p>Macro tests don't read any tables, so they don't need the setup step.</p>
+<h3 id="integration-tests-snowflake-from-this-repo">Integration tests (Snowflake): from this repo<a class="headerlink" href="#integration-tests-snowflake-from-this-repo" title="Permanent link">#</a></h3>
+<p><code>integration_tests/snowflake/</code> is a dbt project that installs this package from the repo and points its <code>snowflake_usage</code> source at fixture tables instead of <code>SNOWFLAKE.ACCOUNT_USAGE</code> (<code>vars.yml</code>). The fixtures describe known activity: demo models with query history, builds, warehouse metering and events, spillage, dbt platform jobs, and access history. The <code>assert_*</code> tests in <code>tests/</code> check what the package recommends from it.</p>
+<p>Run it from <code>integration_tests/snowflake/</code>, with the same profile target as the unit tests. Each edition builds into its own schema, <code>&lt;target schema&gt;_integration</code> (Standard) or <code>&lt;target schema&gt;_integration_enterprise</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">cd</span><span class="w"> </span>integration_tests/snowflake
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>dbt<span class="w"> </span>deps
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># 1. Fixtures and demo models (into &lt;target schema&gt;_fixtures and &lt;target schema&gt;)</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span><span class="s2">"+tag:fixtures models/demo"</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># 2. The package and the assertions, Standard edition: full refresh, then incremental</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="nv">SEL</span><span class="o">=</span><span class="s2">"+tag:gold +fct_snowflake__clustering_key_candidates +fct_snowflake__warehouse_performance_recommendations"</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span><span class="nv">$SEL</span><span class="w"> </span>--exclude<span class="w"> </span>tag:fixtures<span class="w"> </span>--full-refresh
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span><span class="nv">$SEL</span><span class="w"> </span>--exclude<span class="w"> </span>tag:fixtures
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="c1"># 3. The same on Enterprise edition</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="nv">EV</span><span class="o">=</span><span class="s1">'{snowflake_enterprise_edition: true, package_test_schema: integration_enterprise}'</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span><span class="nv">$SEL</span><span class="w"> </span>--exclude<span class="w"> </span>tag:fixtures<span class="w"> </span>--full-refresh<span class="w"> </span>--vars<span class="w"> </span><span class="s2">"</span><span class="nv">$EV</span><span class="s2">"</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span><span class="nv">$SEL</span><span class="w"> </span>--exclude<span class="w"> </span>tag:fixtures<span class="w"> </span>--vars<span class="w"> </span><span class="s2">"</span><span class="nv">$EV</span><span class="s2">"</span>
+</span></code></pre></div>
+<p>What it needs from your account:</p>
+<ul>
+<li><strong>An X-Small warehouse</strong> as the target's warehouse. One fixture runs a query sized to spill on X-Small, for the spillage evidence test.</li>
+<li><strong><code>SNOWFLAKE_SAMPLE_DATA</code></strong>, which Snowflake accounts have by default. Another fixture scans it as a query that does disk I/O but doesn't spill.</li>
+<li><strong>A few cents of credits per run.</strong> The fixtures run real queries: clustering reads, the spill and control queries, and the view-chain demo views the probe measures.</li>
+</ul>
+<blockquote>
+<p><strong>After rebuilding the fixtures, run with <code>--full-refresh</code> first.</strong> Fixture timestamps are relative to now, and the package's incremental models would otherwise keep rows from the previous fixtures.</p>
+</blockquote>
+<h3 id="smoke-test-snowflake-against-the-real-account_usage-views">Smoke test (Snowflake): against the real <code>ACCOUNT_USAGE</code> views<a class="headerlink" href="#smoke-test-snowflake-against-the-real-account_usage-views" title="Permanent link">#</a></h3>
+<p>The integration fixtures have only the columns the package reads. The smoke test builds every package model against the real <code>SNOWFLAKE.ACCOUNT_USAGE</code> views with <code>--empty</code>, which catches a renamed column or a changed type. It uses the same three-step order as the unit test setup, and leaves out the integration project's own assertions, which need fixture data:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>integration_tests/snowflake
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nv">V</span><span class="o">=</span><span class="s1">'{snowflake_usage_database: SNOWFLAKE, snowflake_usage_schema: ACCOUNT_USAGE, package_test_schema: smoke_standard, snowflake_enterprise_edition: false}'</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span>--exclude<span class="w"> </span>int_snowflake__warehouse_config+<span class="w"> </span>fct_snowflake__table_clustering_candidates+<span class="w"> </span>test_type:singular<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span>--empty<span class="w"> </span>--full-refresh<span class="w"> </span>--vars<span class="w"> </span><span class="s2">"</span><span class="nv">$V</span><span class="s2">"</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>int_snowflake__warehouse_config<span class="w"> </span>fct_snowflake__table_clustering_candidates<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span>--exclude<span class="w"> </span>test_type:singular<span class="w"> </span>--full-refresh<span class="w"> </span>--vars<span class="w"> </span><span class="s2">"</span><span class="nv">$V</span><span class="s2">"</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>dbt<span class="w"> </span>build<span class="w"> </span>--select<span class="w"> </span>package:dbt_cost_optimization<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span>--exclude<span class="w"> </span>int_snowflake__warehouse_config<span class="w"> </span>fct_snowflake__table_clustering_candidates<span class="w"> </span>test_type:singular<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span>--empty<span class="w"> </span>--full-refresh<span class="w"> </span>--vars<span class="w"> </span><span class="s2">"</span><span class="nv">$V</span><span class="s2">"</span>
+</span></code></pre></div>
+<p>Run it again without <code>--full-refresh</code> for the incremental path, then repeat both with <code>package_test_schema: smoke_enterprise, snowflake_enterprise_edition: true</code>.</p>
+<blockquote>
+<p><strong>Why the extra var:</strong> unit and macro tests check the package itself, so they're off by default. Otherwise they'd run in every <code>dbt build</code> of a project that installs the package. <code>dbt_cost_optimization_run_package_tests: true</code> turns them on.</p>
+</blockquote>
+<hr />
+<h2 id="4-expected-results">4. Expected results<a class="headerlink" href="#4-expected-results" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Expected summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit tests</td>
+<td><code>22 total \| 22 success</code></td>
+</tr>
+<tr>
+<td>Macro tests</td>
+<td><code>5 total \| 5 success</code></td>
+</tr>
+<tr>
+<td>Integration tests, Standard edition (each run)</td>
+<td><code>143 total \| 143 success</code> (models, data tests and assertions)</td>
+</tr>
+<tr>
+<td>Integration tests, Enterprise edition (each run)</td>
+<td><code>149 total \| 149 success</code></td>
+</tr>
+<tr>
+<td>Smoke test (each step)</td>
+<td>all success, no errors</td>
+</tr>
+<tr>
+<td>Data tests, in an installing project on Snowflake</td>
+<td>all pass: 56 Snowflake mart tests, 2 on an intermediate model, plus 3 on shared models. The savings check (<code>assert_snowflake__savings_do_not_exceed_cost</code>) passes, or warns if a cost formula is off</td>
+</tr>
+</tbody>
+</table>
+<p>The counts grow as tests are added, so treat the run summary as the source of truth.</p>
+<p>A failing unit test prints a row-by-row diff, with <code>expected -&gt; actual</code> for each value that differs, and <code>∅</code> for a missing or extra row. For example:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>| PRIORITY_RANK | SIGNAL_ID                 | RELATED_SIGNALS_COUNT |
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>| 2.0           | add_clustering_key_strong | 1.0 -&gt; 2.0            |
+</span></code></pre></div>
+<hr />
+<h2 id="5-writing-new-tests">5. Writing new tests<a class="headerlink" href="#5-writing-new-tests" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Put unit tests next to the models they test</strong>, in a <code>_&lt;folder&gt;__unit_tests.yml</code> file. Give each one a <code>description:</code> that lists its cases, so reviewers can see the coverage without reading the SQL.</li>
+<li><strong>Give every row the same columns</strong> in <code>expect:</code> rows. A column left out of some rows is compared as null in those rows.</li>
+<li><strong>Give every parent an input.</strong> Use <code>rows: []</code> for parents a case doesn't need.</li>
+<li><strong>Keep time windows stable.</strong> For rows inside a "last N days" window, use dates far in the future (<code>2099-01-01</code>). For rows that should fall outside it, use dates far in the past (<code>2000-01-01</code>). The tests then don't go stale.</li>
+<li><strong>Use <code>overrides: vars:</code></strong> to test var-driven behavior, such as the <code>scope_filter</code> settings.</li>
+<li><strong>Prove the test can fail.</strong> Change one expected value, or break the logic the test covers, and confirm it fails with a clear diff. Then restore it.</li>
+<li><strong>Integration fixtures:</strong></li>
+<li><strong>Type each fixture from the real view.</strong> Start it with <code>select &lt;columns&gt; from snowflake.account_usage.&lt;view&gt; where false union all ...</code>, so its columns take the real types and the build fails fast if Snowflake renames one.</li>
+<li><strong>Use relative timestamps</strong> (<code>dateadd(..., current_timestamp())</code>), so rows always fall inside the package's lookback windows.</li>
+<li><strong>Use real query IDs where a hook reads them.</strong> <code>GET_QUERY_OPERATOR_STATS</code> rejects IDs that don't exist, so the fixture runs the query with <code>run_query</code> and records <code>last_query_id()</code>. Add a <code>-- depends_on: {{ ref(...) }}</code> hint for any <code>ref()</code> used only inside <code>{% if execute %}</code>.</li>
+<li><strong>Keep slices from changing each other.</strong> Builds that one slice needs, but that shouldn't count as dbt sessions, run from session 1 (no dbt session), so they don't change the user attribution or expensive-query results.</li>
+<li><strong>Make assertions edition-aware</strong> with <code>{% if var('snowflake_enterprise_edition', true) %}</code> wherever Enterprise should differ. Everywhere else, both editions must give the same result.</li>
+<li><strong>Where a value comes from a real measurement</strong> (the view probe, operator stats), assert it's consistent with the measurement rather than a fixed number.</li>
+<li><strong>Put macro tests in <code>tests/snowflake/macros/</code>.</strong> They're enabled and tagged by the <code>data_tests: dbt_cost_optimization: snowflake: macros:</code> block in <code>dbt_project.yml</code>. Keep that config scoped to <code>macros:</code>: config under <code>data_tests:</code> also applies to generic tests defined in the models' YAML when the paths overlap.</li>
+</ul>
+<hr />
+<h2 id="6-not-covered-by-automated-tests-yet">6. Not covered by automated tests yet<a class="headerlink" href="#6-not-covered-by-automated-tests-yet" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>How it's checked today</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Post-hooks against real <code>SHOW WAREHOUSES</code> settings</strong></td>
+<td>The integration tests run every hook, but fixture warehouses don't exist in the account, so the multi-cluster settings come from a simulated <code>SHOW WAREHOUSES</code> hook (<code>integration_tests/snowflake/macros/simulate_show_warehouses.sql</code>). Check the real path manually (see the checklist below).</td>
+</tr>
+<tr>
+<td><strong>The 7 <code>dbt run-operation</code> commands</strong></td>
+<td>Manual: they query <code>SNOWFLAKE.ACCOUNT_USAGE</code> directly, so test inputs can't reach them (see the checklist below).</td>
+</tr>
+<tr>
+<td><strong>Databricks, BigQuery, Redshift</strong></td>
+<td>Data tests only, for now</td>
+</tr>
+</tbody>
+</table>
+<p>Planned: CI that runs <code>dbt parse</code> on every platform.</p>
+<h3 id="manual-checklist-hooks">Manual checklist: hooks<a class="headerlink" href="#manual-checklist-hooks" title="Permanent link">#</a></h3>
+<p>Build the package in a real project, then check:</p>
+<ul>
+<li>[ ] <code>fct_snowflake__incremental_config_recommendations</code>: the log shows <code>probe_unique_key_candidates: starting exact uniqueness probe</code>. Where there are merge candidates, <code>likely_unique_key</code> is filled in.</li>
+<li>[ ] <code>fct_snowflake__table_clustering_candidates</code>: the log shows <code>extract_operator_evidence:</code> and <code>refresh_column_cardinality:</code> messages. <code>int_snowflake__query_operator_evidence</code> and <code>int_snowflake__column_cardinality</code> have fresh rows.</li>
+<li>[ ] <code>int_snowflake__warehouse_config</code>: the log shows <code>refresh_warehouse_config: merged config for all warehouses</code>, and <code>auto_suspend</code>, <code>scaling_policy</code>, and the cluster counts are filled in. A warehouse with <code>max_cluster_count &gt; 1</code> has <code>is_multicluster</code> true.</li>
+<li>[ ] <code>int_snowflake__view_probe</code>: the log shows <code>probe_view_recompute:</code> messages, and views in view chains have rows with <code>probe_status = 'ok'</code>.</li>
+<li>[ ] <code>fct_snowflake__warehouse_performance_recommendations</code> (Enterprise): the log shows a per-table <code>extract_spill_evidence: ... analyzed N of M sampled spilling queries</code> line, and <code>int_snowflake__query_spill_evidence</code> has rows.</li>
+</ul>
+<h3 id="manual-checklist-run-operation-commands">Manual checklist: <code>run-operation</code> commands<a class="headerlink" href="#manual-checklist-run-operation-commands" title="Permanent link">#</a></h3>
+<p>Run each command with its defaults, then with at least one argument override. Confirm that the <code>Criteria:</code> line in the log reflects the override. Do this on both a Snowflake <strong>Enterprise</strong> and a <strong>Standard</strong> edition account.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dbt<span class="w"> </span>run-operation<span class="w"> </span>find_table_clustering_candidates<span class="w"> </span>--args<span class="w"> </span><span class="s1">'{lookback_days: 14}'</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>dbt<span class="w"> </span>run-operation<span class="w"> </span>suggest_clustering_keys<span class="w"> </span>--args<span class="w"> </span><span class="s1">'{model_name: &lt;a model&gt;, include_boolean_cols: true}'</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>dbt<span class="w"> </span>run-operation<span class="w"> </span>find_table_materialization_candidates<span class="w"> </span>--args<span class="w"> </span><span class="s1">'{lookback_days: 7, min_query_count: 30}'</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>dbt<span class="w"> </span>run-operation<span class="w"> </span>find_incremental_materialization_candidates<span class="w"> </span>--args<span class="w"> </span><span class="s1">'{min_table_size_gb: 50}'</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>dbt<span class="w"> </span>run-operation<span class="w"> </span>find_warehouse_sizing_recommendations<span class="w"> </span>--args<span class="w"> </span><span class="s1">'{lookback_days: 14}'</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>dbt<span class="w"> </span>run-operation<span class="w"> </span>find_spillage_candidates<span class="w"> </span>--args<span class="w"> </span><span class="s1">'{lookback_days: 14}'</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>dbt<span class="w"> </span>run-operation<span class="w"> </span>find_expensive_dbt_queries<span class="w"> </span>--args<span class="w"> </span><span class="s1">'{top_n: 10}'</span>
+</span></code></pre></div>
+<p>On a platform without a Snowflake implementation, each command should fail with <code>… is not yet implemented for '&lt;platform&gt;'</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../redshift/materialization-strategy/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Materialization strategy">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Materialization strategy
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../contributing/" class="md-footer__link md-footer__link--next" aria-label="Next: Contributing">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Contributing
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.footer", "navigation.instant", "navigation.tracking", "content.action.edit", "content.code.copy", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
