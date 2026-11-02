@@ -4,23 +4,26 @@ All notable changes to this package are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-This is the changelog for the **dbt v2** release line (`2.x.x`, from the `main` branch). The dbt v1 line (`1.x.x`) is on the `main-v1` branch. A MINOR version number means the same features on both lines: `2.N` and `1.N` match.
-
 ## [Unreleased]
 
-## [2.0.0] - Unreleased
+## [1.0.0] - Unreleased
 
-First public release for dbt v2: one package with a shared design across Snowflake, Databricks, BigQuery, and Redshift. `1.0.0`, from the `main-v1` branch, has the same features for dbt v1.
+First public release: one package with a shared design across Snowflake, Databricks, BigQuery, and Redshift, for dbt v2 (the dbt Fusion engine) and dbt v1 (dbt-core 1.10 and later).
+
+### dbt v1 and dbt v2 support
+- `require-dbt-version: [">=1.10.0", "<3.0.0"]`.
+- The settings that switch models on and off are environment variables that work the same on dbt v1 and dbt v2: `DBT_COST_OPTIMIZATION_ENABLED`, `DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION`, `DBT_COST_OPTIMIZATION_AI_REST_API_ENABLED`, and `DBT_COST_OPTIMIZATION_USE_QUERY_TEXT_ATTRIBUTION`. On dbt v1, dbt-core renders an installed package's `dbt_project.yml` without your project's vars, so a var can't switch models on there. On dbt v2, the matching vars also work in `vars.yml` or with `--vars`. Models and macros read the same settings through `cost_optimization_setting()`, so the two always agree.
+- Every other var works on both: your `dbt_project.yml` `vars:` section, `--vars`, or `vars.yml` (dbt v2 and dbt-core 1.12 and later; dbt-core 1.10 and 1.11 don't read `vars.yml`, so use the `vars:` section or `--vars`). On dbt v1, var values must be literals.
+- `-- depends_on` hints on `fct_snowflake__table_clustering_candidates` for the models its post-hooks read, and the Snowflake post-hook macros refer to their own model as `this`: dbt v1 doesn't see `ref()` calls inside post-hook macros.
 
 ### Added
 
 #### Package design (all platforms)
-- Requires dbt v2 (`require-dbt-version: [">=2.0.0", "<3.0.0"]`). For dbt v1, use the `1.x.x` releases from the `main-v1` branch.
 - Platform-first layout: each platform's models live in `models/<platform>/` (staging, intermediate, marts), and cross-platform models live in `models/shared/`.
-- Opt-in by default: package models only build when `dbt_cost_optimization_enabled: true`, and only the models for your data platform are enabled.
+- Opt-in by default: package models only build when `dbt_cost_optimization_enabled` is true (or `DBT_COST_OPTIMIZATION_ENABLED=true`), and only the models for your data platform are enabled.
 - Macros behind `adapter.dispatch`: each command and utility keeps one public name and runs the right implementation for your data platform, or raises a clear "not yet implemented" error where one doesn't exist yet. Implementations live in `macros/platforms/<platform>/`, and `macros/_macros.yml` documents every macro's arguments and which platforms implement it.
 - Domain tags on marts for scheduled jobs (`+tag:clustering`, `+tag:materialization`, `+tag:warehouse`, `+tag:ai_spend`, `+tag:gold`), plus `dbt_cost_optimization` on every mart. On Snowflake, the intermediate models that feed only the gold views are tagged `gold` too, so `tag:gold` (no `+`) refreshes the dashboards from the last domain builds.
-- Package vars grouped into package-wide, shared, and per-platform sections in `dbt_project.yml`. Override them in a `vars.yml` file in your project root or with `--vars`.
+- Package vars grouped into package-wide, shared, and per-platform sections in `dbt_project.yml`. Override them in your `dbt_project.yml` `vars:` section, a `vars.yml` file in your project root (dbt v2 and dbt-core 1.12 and later), or with `--vars`.
 - Shared dbt graph models: `int_dbt__relations` (models) and `int_dbt__snapshots` (snapshots).
 
 #### Snowflake (GA)
@@ -66,5 +69,5 @@ First public release for dbt v2: one package with a shared design across Snowfla
 - Table materialization, incremental materialization, and incremental config recommendations.
 - VACUUM and ANALYZE candidates.
 
-[Unreleased]: https://github.com/dbt-labs/dbt-cost-optimization/compare/2.0.0...main
-[2.0.0]: https://github.com/dbt-labs/dbt-cost-optimization/releases/tag/2.0.0
+[Unreleased]: https://github.com/dbt-labs/dbt-cost-optimization/compare/1.0.0...main
+[1.0.0]: https://github.com/dbt-labs/dbt-cost-optimization/releases/tag/1.0.0

@@ -5,10 +5,15 @@
 {#- The clustering post-hooks read these two models by name, not ref(), so declare the
     dependency here. Both are Enterprise-only (disabled when snowflake_enterprise_edition
     is false), and a ref() to a disabled model fails to parse, hence the edition check. -#}
-{% if var('snowflake_enterprise_edition', true) %}
+{% if cost_optimization_setting('snowflake_enterprise_edition', true) %}
 -- depends_on: {{ ref('int_snowflake__column_query_access') }}
 -- depends_on: {{ ref('int_snowflake__column_query_stats') }}
 {% endif %}
+{#- dbt v1 doesn't see ref() calls inside post-hook macros; the clustering hooks read
+    these models, so declare them here (a no-op on dbt v2). -#}
+-- depends_on: {{ ref('int_snowflake__table_columns') }}
+-- depends_on: {{ ref('int_snowflake__query_history') }}
+-- depends_on: {{ ref('int_snowflake__column_cardinality') }}
 {{
   config(
     materialized='incremental',

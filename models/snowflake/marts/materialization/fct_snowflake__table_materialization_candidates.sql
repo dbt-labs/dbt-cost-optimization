@@ -44,7 +44,7 @@ with view_candidates as (
     where lower(materialized) = 'view'
 ),
 
-{% if var('snowflake_enterprise_edition', true) %}
+{% if cost_optimization_setting('snowflake_enterprise_edition', true) %}
 -- Enterprise+ path: use ACCESS_HISTORY for exact FQN attribution
 matched_queries as (
     select

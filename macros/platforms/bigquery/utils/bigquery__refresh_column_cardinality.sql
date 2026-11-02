@@ -50,7 +50,7 @@
     — this macro only ever runs as that model's own post-hook, so ref()-ing itself
     here would create a self-referencing cycle now that refs are captured eagerly.
   --#}
-  {% set use_query_text_attribution = var('use_query_text_attribution', true) %}
+  {% set use_query_text_attribution = dbt_cost_optimization.cost_optimization_setting('use_query_text_attribution', true) %}
   {% set col_cols_table    = ref('int_bigquery__table_columns') %}
   {% set cardinality_table = ref('int_bigquery__column_cardinality') %}
   {% if use_query_text_attribution %}

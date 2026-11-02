@@ -2,7 +2,7 @@
 
 How this package is tested, how to run the tests, and what the results should look like.
 
-**Scope today:** Snowflake, on dbt v2 (this branch, `main`). The same suites run on dbt v1 from the `main-v1` branch, whose TESTING.md has the dbt v1 commands. The Databricks, BigQuery, and Redshift models are in beta and have their own data tests. Their unit tests are planned.
+**Scope today:** Snowflake, on dbt v2 (the dbt Fusion engine) and dbt v1 (dbt-core 1.10 and later). The same commands and expected results apply to both engines. The Databricks, BigQuery, and Redshift models are in beta and have their own data tests. Their unit tests are planned.
 
 ---
 
@@ -32,7 +32,7 @@ Every unit test and macro test has been checked to **fail** when the logic it co
 
 ## 2. Before you start
 
-- **dbt v2.** This branch is tested on dbt v2. For dbt v1, see the `main-v1` branch.
+- **dbt v2 (the dbt Fusion engine), or dbt v1: dbt-core 1.10 or later with dbt-snowflake.** The suites below run on both. On dbt v1 they were run on dbt-core 1.11.7 and 1.10.23. To run dbt v1 without changing your installed dbt, use `uvx`, for example `uvx --from 'dbt-core~=1.11.0' --with 'dbt-snowflake~=1.11.0' dbt <command>`.
 - **A Snowflake role that can read `SNOWFLAKE.ACCOUNT_USAGE`** (`IMPORTED PRIVILEGES` on the `SNOWFLAKE` database), plus a warehouse.
 - **A dedicated test schema.** Setting up unit tests builds tables (mostly empty) in it. Because the package sets `+schema: dbt_cost_optimization`, models land in `<your target schema>_dbt_cost_optimization`.
 - **A dbt profile target** for this repo's profile, `dbt_cost_optimization`, in `~/.dbt/profiles.yml`. Key-pair authentication works well for repeated test runs:
@@ -56,7 +56,12 @@ Every unit test and macro test has been checked to **fail** when the logic it co
 
 > **Never commit credentials.** Keep profiles and keys outside the repo. `target/` and `logs/` are gitignored because compiled SQL and logs contain database and schema names.
 
-Every command below passes `--vars '{dbt_cost_optimization_enabled: true}'`, because the package's models are disabled by default. Add `--target <your target>` if your test target isn't the profile's default.
+The package's models are disabled by default, so every command below turns them on:
+
+- **From this repo (unit and macro tests),** the package is the root project, so `--vars '{dbt_cost_optimization_enabled: true}'` turns it on.
+- **Where the package is installed** (the data tests, the integration tests and the smoke test), it's turned on with the environment variable `DBT_COST_OPTIMIZATION_ENABLED=true`, which works on both engines (on dbt v1, the package's `dbt_project.yml` can't read vars). Standard edition also needs `DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false`.
+
+Add `--target <your target>` if your test target isn't the profile's default.
 
 ---
 
@@ -67,13 +72,14 @@ Every command below passes `--vars '{dbt_cost_optimization_enabled: true}'`, bec
 Data tests check real output, so run them where the package analyzes real activity: in a dbt project that installs this package and has models with query history.
 
 ```bash
-dbt build --select package:dbt_cost_optimization --vars '{dbt_cost_optimization_enabled: true}'
+export DBT_COST_OPTIMIZATION_ENABLED=true
+dbt build --select package:dbt_cost_optimization
 ```
 
 To run only the tests against models you've already built:
 
 ```bash
-dbt test --select package:dbt_cost_optimization,test_type:data --vars '{dbt_cost_optimization_enabled: true}'
+dbt test --select package:dbt_cost_optimization,test_type:data
 ```
 
 ### Unit and macro tests: from this repo
@@ -112,27 +118,35 @@ Macro tests don't read any tables, so they don't need the setup step.
 
 ### Integration tests (Snowflake): from this repo
 
-`integration_tests/snowflake/` is a dbt project that installs this package from the repo and points its `snowflake_usage` source at fixture tables instead of `SNOWFLAKE.ACCOUNT_USAGE` (`vars.yml`). The fixtures describe known activity: demo models with query history, builds, warehouse metering and events, spillage, dbt platform jobs, and access history. The `assert_*` tests in `tests/` check what the package recommends from it.
+`integration_tests/snowflake/` is a dbt project that installs this package from the repo and points its `snowflake_usage` source at fixture tables instead of `SNOWFLAKE.ACCOUNT_USAGE`. Its vars are in its `dbt_project.yml` (dbt v1 doesn't read `vars.yml`). The source location is passed with `--vars` on each command, as literal values: it depends on your target, and dbt v1 doesn't render Jinja in var values. The fixtures describe known activity: demo models with query history, builds, warehouse metering and events, spillage, dbt platform jobs, and access history. The `assert_*` tests in `tests/` check what the package recommends from it.
 
 Run it from `integration_tests/snowflake/`, with the same profile target as the unit tests. Each edition builds into its own schema, `<target schema>_integration` (Standard) or `<target schema>_integration_enterprise`:
 
 ```bash
 cd integration_tests/snowflake
 dbt deps
+export DBT_COST_OPTIMIZATION_ENABLED=true
+
+# Your target's database, and its schema with _fixtures appended (literal values)
+SRC='snowflake_usage_database: <target database>, snowflake_usage_schema: <target schema>_fixtures'
 
 # 1. Fixtures and demo models (into <target schema>_fixtures and <target schema>)
-dbt build --select "+tag:fixtures models/demo"
+export DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false
+dbt build --select "+tag:fixtures models/demo" --vars "{$SRC}"
 
 # 2. The package and the assertions, Standard edition: full refresh, then incremental
 SEL="+tag:gold +fct_snowflake__clustering_key_candidates +fct_snowflake__warehouse_performance_recommendations"
-dbt build --select $SEL --exclude tag:fixtures --full-refresh
-dbt build --select $SEL --exclude tag:fixtures
+dbt build --select $SEL --exclude tag:fixtures --full-refresh --vars "{$SRC}"
+dbt build --select $SEL --exclude tag:fixtures --vars "{$SRC}"
 
 # 3. The same on Enterprise edition
-EV='{snowflake_enterprise_edition: true, package_test_schema: integration_enterprise}'
+export DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=true
+EV="{$SRC, snowflake_enterprise_edition: true, package_test_schema: integration_enterprise}"
 dbt build --select $SEL --exclude tag:fixtures --full-refresh --vars "$EV"
 dbt build --select $SEL --exclude tag:fixtures --vars "$EV"
 ```
+
+The edition is set in both places on purpose: the environment variable switches the Enterprise-only models on, and the var is what the integration project's own assertions read.
 
 What it needs from your account:
 
@@ -148,6 +162,7 @@ The integration fixtures have only the columns the package reads. The smoke test
 
 ```bash
 cd integration_tests/snowflake
+export DBT_COST_OPTIMIZATION_ENABLED=true DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false
 V='{snowflake_usage_database: SNOWFLAKE, snowflake_usage_schema: ACCOUNT_USAGE, package_test_schema: smoke_standard, snowflake_enterprise_edition: false}'
 dbt build --select package:dbt_cost_optimization \
   --exclude int_snowflake__warehouse_config+ fct_snowflake__table_clustering_candidates+ test_type:singular \
@@ -159,7 +174,7 @@ dbt build --select package:dbt_cost_optimization \
   --empty --full-refresh --vars "$V"
 ```
 
-Run it again without `--full-refresh` for the incremental path, then repeat both with `package_test_schema: smoke_enterprise, snowflake_enterprise_edition: true`.
+Run it again without `--full-refresh` for the incremental path, then repeat both with `DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=true` and `package_test_schema: smoke_enterprise, snowflake_enterprise_edition: true`.
 
 > **Why the extra var:** unit and macro tests check the package itself, so they're off by default. Otherwise they'd run in every `dbt build` of a project that installs the package. `dbt_cost_optimization_run_package_tests: true` turns them on.
 

@@ -106,15 +106,14 @@ tiebreaker, capped at four columns per table.
 |---|---|---|
 | `clustering_candidates_lookback_days` | `7` | Lookback window for query-text and column-query-stats reads. |
 | `clustering_key_cardinality_table_limit` | `10` | Max number of candidate tables for which APPROX_COUNT_DISTINCT is computed each run. |
-| `use_query_text_attribution` | `true` | When `false`, disables the heuristic column-access pipeline. `usage_count` becomes 0 and ranking falls back to cardinality only. |
+| `use_query_text_attribution` | `true` | When `false`, disables the heuristic column-access pipeline. `usage_count` becomes 0 and ranking falls back to cardinality only. On dbt v1, set it as the environment variable `DBT_COST_OPTIMIZATION_USE_QUERY_TEXT_ATTRIBUTION=false`: it switches models on and off, and a package's `dbt_project.yml` can't read your project's vars on dbt v1. |
 
-Override in a `vars.yml` file in your project root (or with `--vars`):
+Override in your project's `dbt_project.yml` `vars:` section (or with `--vars`):
 
 ```yaml
 vars:
   clustering_candidates_lookback_days: 14
   clustering_key_cardinality_table_limit: 25
-  use_query_text_attribution: true
 ```
 
 ## BigQuery-specific caveats

@@ -31,7 +31,7 @@
     {{ log("Criteria: Table > " ~ min_table_size_gb ~ " GB & Build Time > " ~ max_build_time_sec ~ "s in last " ~ lookback_days ~ " days.", info=true) }}
     {{ log("Priority tiers: HIGH (size > 100 GB AND avg build > 30 min), MEDIUM (size > 50 GB OR avg build > 15 min), LOW (above floor but below MEDIUM).", info=true) }}
 
-    {% set is_enterprise = var('snowflake_enterprise_edition', true) %}
+    {% set is_enterprise = dbt_cost_optimization.cost_optimization_setting('snowflake_enterprise_edition', true) %}
 
     {# --- snowflake performance and size query --- #}
     {% if is_enterprise %}

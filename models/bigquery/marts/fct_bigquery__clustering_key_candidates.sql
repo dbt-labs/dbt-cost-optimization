@@ -8,7 +8,7 @@
 
 {% set lookback_days = var('clustering_candidates_lookback_days', 7) %}
 {% set cardinality_limit = var('clustering_key_cardinality_table_limit', 10) %}
-{% set use_query_text_attribution = var('use_query_text_attribution', true) %}
+{% set use_query_text_attribution = cost_optimization_setting('use_query_text_attribution', true) %}
 
 with candidates as (
     select

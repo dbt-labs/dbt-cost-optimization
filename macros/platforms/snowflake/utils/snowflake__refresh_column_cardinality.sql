@@ -31,10 +31,12 @@
 
     {% set cardinality_limit = var('clustering_key_cardinality_table_limit', 10) %}
     {% set lookback_days = var('clustering_candidates_lookback_days', 7) %}
-    {% set is_enterprise = var('snowflake_enterprise_edition', true) %}
+    {% set is_enterprise = dbt_cost_optimization.cost_optimization_setting('snowflake_enterprise_edition', true) %}
 
     {# Resolve table references once #}
-    {% set candidates_table = ref('fct_snowflake__table_clustering_candidates') %}
+    {#- `this`, not ref() to this model: a post-hook's ref() to its own model is invisible to
+        dbt v1, and a depends_on hint for it is a cycle. The hook only runs on this model. -#}
+    {% set candidates_table = this %}
     {% set col_cols_table = ref('int_snowflake__table_columns') %}
     {% set cardinality_table = ref('int_snowflake__column_cardinality') %}
     {# column_query_stats is Enterprise-only (depends on ACCESS_HISTORY).

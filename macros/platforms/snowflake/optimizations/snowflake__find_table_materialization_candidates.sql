@@ -17,7 +17,7 @@
 
   {% if execute %}
 
-    {% set is_enterprise = var('snowflake_enterprise_edition', true) %}
+    {% set is_enterprise = dbt_cost_optimization.cost_optimization_setting('snowflake_enterprise_edition', true) %}
 
     {{ log("--- Starting Materialization Candidate Analysis ---", info=true) }}
     {{ log("Criteria: View queried > " ~ min_query_count ~ " times in last " ~ lookback_days ~ " days.", info=true) }}

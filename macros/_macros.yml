@@ -381,6 +381,24 @@ macros:
       - name: left_alias
         description: "Alias of the relation being joined (must have database_name, schema_name, table_name)"
 
+  - name: cost_optimization_setting
+    description: >
+      Reads an on/off setting that also gates models in dbt_project.yml
+      (dbt_cost_optimization_enabled, snowflake_enterprise_edition, ai_rest_api_enabled,
+      use_query_text_attribution, dbt_cost_optimization_run_package_tests). On dbt v1 the
+      package's dbt_project.yml can't see vars, so each can also be set as an environment
+      variable, DBT_COST_OPTIMIZATION_<NAME> (e.g. DBT_COST_OPTIMIZATION_ENABLED,
+      DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION). A setting that defaults to false
+      is on when the var or the env var is true; one that defaults to true is off when either
+      is false. The same rule as the gates, so models and gates agree.
+      Intentionally NOT dispatched.
+      Implemented for: all platforms.
+    arguments:
+      - name: name
+        description: "The var name, e.g. 'snowflake_enterprise_edition'"
+      - name: default
+        description: "The setting's default (true or false)"
+
   - name: make_string_array
     description: >
       Builds a string array literal with the correct syntax for the active platform.

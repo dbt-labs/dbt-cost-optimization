@@ -33,7 +33,7 @@
     - spillage_min_runs               (default 1)
 --#}
 
-{% set is_enterprise  = var('snowflake_enterprise_edition', true) %}
+{% set is_enterprise  = cost_optimization_setting('snowflake_enterprise_edition', true) %}
 {% set lookback_days       = var('spillage_lookback_days', 30) %}
 {% set min_total_gb        = var('spillage_min_total_gb', 0.05) %}
 {% set min_runs            = var('spillage_min_runs', 1) %}

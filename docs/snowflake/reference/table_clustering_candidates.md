@@ -98,7 +98,7 @@ fct_snowflake__table_clustering_candidates (identifies WHICH tables)
 
 ## Project Variables
 
-Set these in a `vars.yml` file in your project root (or with `--vars`) to customize behavior.
+Set these in your project's `dbt_project.yml` `vars:` section (or with `--vars`) to customize behavior. On Standard edition, also set the environment variable `DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION=false` (see the [setup guide](../index.md#configuration)).
 
 ### Attribution and edition
 
@@ -127,11 +127,8 @@ Set these in a `vars.yml` file in your project root (or with `--vars`) to custom
 ### Example configuration
 
 ```yaml
-# vars.yml
+# dbt_project.yml
 vars:
-  # Standard edition Snowflake
-  snowflake_enterprise_edition: false
-
   # Include smaller tables for testing
   clustering_candidates_min_size_gb: 1
 

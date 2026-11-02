@@ -164,8 +164,10 @@ models/
 
 ## Configurable Variables
 
+Set these in your project's `dbt_project.yml` `vars:` section (or with `--vars`):
+
 ```yaml
-# vars.yml
+# dbt_project.yml
 vars:
   # Lookback windows
   ai_spend_lookback_days: 30
@@ -186,10 +188,9 @@ vars:
   # Minimum activity for recommendations
   ai_min_credits_for_recommendation: 1
   ai_min_queries_for_recommendation: 10
-
-  # REST API (dollar-billed) — separate tracking
-  ai_rest_api_enabled: true
 ```
+
+To leave Cortex REST API usage (billed in dollars) out of the analysis, set the environment variable `DBT_COST_OPTIMIZATION_AI_REST_API_ENABLED=false`. It switches models on and off, so on dbt v1 it's an environment variable rather than a var.
 
 ---
 

@@ -3,8 +3,9 @@ version: '1.0.0'
 config-version: 2
 
 # Integration tests for the Snowflake side of dbt_cost_optimization.
-# Fixture models stand in for SNOWFLAKE.ACCOUNT_USAGE views; vars.yml points the
-# package's snowflake_usage source at them. See TESTING.md at the repo root.
+# Fixture models stand in for SNOWFLAKE.ACCOUNT_USAGE views. The test commands point
+# the package's snowflake_usage source at them with --vars, because dbt v1 doesn't
+# render Jinja in var values (see TESTING.md at the repo root).
 #
 # Uses the package's own profile name, so the same ~/.dbt/profiles.yml target works
 # for unit tests (repo root) and integration tests (this project).
@@ -55,3 +56,28 @@ models:
       +materialized: table
       +schema: fixtures
       +tags: ['fixtures']
+
+# dbt v1 doesn't read vars.yml, so the project's vars live here. The package's on/off
+# settings (DBT_COST_OPTIMIZATION_ENABLED, ..._SNOWFLAKE_ENTERPRISE_EDITION) are also set
+# as environment variables in the test commands: on dbt v1, the package's dbt_project.yml
+# gates only see those. The source location (snowflake_usage_database/_schema) is passed
+# with --vars, since it depends on the target.
+vars:
+  dbt_cost_optimization_enabled: true
+
+  # Materialization slice uses the Standard-edition path (query-text attribution),
+  # so only the query_history fixture is needed.
+  snowflake_enterprise_edition: false
+
+  # Clustering slice: the demo table is small, so drop the size floor.
+  clustering_candidates_min_size_gb: 0
+
+  # Clustering slice: analyze 10 of DEMO_EVENTS' 20 reads, so the clustering savings'
+  # filter share must use the analyzed count (10), not all reads (20).
+  clustering_key_operator_queries_per_table: 10
+
+  # View chain slice: probe only the two chain views (the deepest chain comes first), so
+  # demo_slow_view keeps its read-duration cost and fixed expectations. Re-probe every
+  # run, so the incremental run probes the same two views.
+  table_materialization_view_probe_limit: 2
+  table_materialization_view_probe_refresh_days: 0

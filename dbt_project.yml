@@ -1,5 +1,5 @@
 name: 'dbt_cost_optimization'
-version: '2.0.0'
+version: '1.0.0'
 config-version: 2
 
 profile: 'dbt_cost_optimization'
@@ -12,7 +12,7 @@ clean-targets:
   - "dbt_packages"
   - "logs"
 
-require-dbt-version: [">=2.0.0", "<3.0.0"]
+require-dbt-version: [">=1.10.0", "<3.0.0"]
 
 # Model configurations
 models:
@@ -21,26 +21,26 @@ models:
     # Shared platform-agnostic models (always enabled for ref resolution)
     shared:
       +materialized: view
-      +enabled: "{{ var('dbt_cost_optimization_enabled', false) }}"
+      +enabled: "{{ (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') }}"
     # Snowflake optimization models
     snowflake:
-      +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) }}"
+      +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') }}"
       staging:
         +materialized: view
         stg_snowflake__access_history:
-          +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) and var('snowflake_enterprise_edition', true) }}"
+          +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('snowflake_enterprise_edition', true) and env_var('DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION', 'true') | lower == 'true') }}"
         stg_snowflake__cortex_rest_api_usage:
-          +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) and var('ai_rest_api_enabled', true) }}"
+          +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('ai_rest_api_enabled', true) and env_var('DBT_COST_OPTIMIZATION_AI_REST_API_ENABLED', 'true') | lower == 'true') }}"
       intermediate:
         +materialized: view
         int_snowflake__query_table_access:
-          +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) and var('snowflake_enterprise_edition', true) }}"
+          +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('snowflake_enterprise_edition', true) and env_var('DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION', 'true') | lower == 'true') }}"
         int_snowflake__column_query_access:
-          +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) and var('snowflake_enterprise_edition', true) }}"
+          +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('snowflake_enterprise_edition', true) and env_var('DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION', 'true') | lower == 'true') }}"
         int_snowflake__column_query_stats:
-          +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) and var('snowflake_enterprise_edition', true) }}"
+          +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('snowflake_enterprise_edition', true) and env_var('DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION', 'true') | lower == 'true') }}"
         int_snowflake__direct_object_access:
-          +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) and var('snowflake_enterprise_edition', true) }}"
+          +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('snowflake_enterprise_edition', true) and env_var('DBT_COST_OPTIMIZATION_SNOWFLAKE_ENTERPRISE_EDITION', 'true') | lower == 'true') }}"
         # Feed only the gold layer, so `tag:gold` (no +) refreshes them with the views
         int_snowflake__all_recommendations:
           +tags: ['gold']
@@ -63,7 +63,7 @@ models:
           +tags: ['gold', 'dbt_cost_optimization']
     # Redshift optimization models
     redshift:
-      +enabled: "{{ target.type == 'redshift' and var('dbt_cost_optimization_enabled', false) }}"
+      +enabled: "{{ target.type == 'redshift' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') }}"
       staging:
         +materialized: view
       intermediate:
@@ -82,15 +82,15 @@ models:
           +tags: ['materialization']
     # BigQuery optimization models
     bigquery:
-      +enabled: "{{ target.type == 'bigquery' and var('dbt_cost_optimization_enabled', false) }}"
+      +enabled: "{{ target.type == 'bigquery' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') }}"
       staging:
         +materialized: view
       intermediate:
         +materialized: view
         int_bigquery__column_query_access:
-          +enabled: "{{ target.type == 'bigquery' and var('dbt_cost_optimization_enabled', false) and var('use_query_text_attribution', true) }}"
+          +enabled: "{{ target.type == 'bigquery' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('use_query_text_attribution', true) and env_var('DBT_COST_OPTIMIZATION_USE_QUERY_TEXT_ATTRIBUTION', 'true') | lower == 'true') }}"
         int_bigquery__column_query_stats:
-          +enabled: "{{ target.type == 'bigquery' and var('dbt_cost_optimization_enabled', false) and var('use_query_text_attribution', true) }}"
+          +enabled: "{{ target.type == 'bigquery' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('use_query_text_attribution', true) and env_var('DBT_COST_OPTIMIZATION_USE_QUERY_TEXT_ATTRIBUTION', 'true') | lower == 'true') }}"
       marts:
         +tags: ['dbt_cost_optimization']
         fct_bigquery__table_clustering_candidates:
@@ -99,7 +99,7 @@ models:
           +tags: ['clustering']
     # Databricks optimization models
     databricks:
-      +enabled: "{{ target.type == 'databricks' and var('dbt_cost_optimization_enabled', false) }}"
+      +enabled: "{{ target.type == 'databricks' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') }}"
       staging:
         +materialized: view
       intermediate:
@@ -124,17 +124,17 @@ models:
 # (see TESTING.md). Data tests stay on: they check the installing project's real output.
 unit_tests:
   dbt_cost_optimization:
-    +enabled: "{{ var('dbt_cost_optimization_enabled', false) and var('dbt_cost_optimization_run_package_tests', false) }}"
+    +enabled: "{{ (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('dbt_cost_optimization_run_package_tests', false) or env_var('DBT_COST_OPTIMIZATION_RUN_PACKAGE_TESTS', 'false') | lower == 'true') }}"
 
 data_tests:
   dbt_cost_optimization:
     snowflake:
       macros:
-        +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) and var('dbt_cost_optimization_run_package_tests', false) }}"
+        +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') and (var('dbt_cost_optimization_run_package_tests', false) or env_var('DBT_COST_OPTIMIZATION_RUN_PACKAGE_TESTS', 'false') | lower == 'true') }}"
         +tags: ['dbt_cost_optimization', 'macro_tests']
       # Checks on the package's real output. On by default, as warnings.
       recommendations:
-        +enabled: "{{ target.type == 'snowflake' and var('dbt_cost_optimization_enabled', false) }}"
+        +enabled: "{{ target.type == 'snowflake' and (var('dbt_cost_optimization_enabled', false) or env_var('DBT_COST_OPTIMIZATION_ENABLED', 'false') | lower == 'true') }}"
         +severity: warn
         +tags: ['dbt_cost_optimization']
 

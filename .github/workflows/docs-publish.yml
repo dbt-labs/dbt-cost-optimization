@@ -3,9 +3,7 @@ name: Publish docs
 # Builds the MkDocs site and publishes it to GitHub Pages with mike (gh-pages branch),
 # versioned like the dbt-project-evaluator docs:
 #   - push to main         → the "main" version (unreleased docs)
-#   - release published    → an "X.Y" version from the tag, with an alias for its dbt line:
-#       releases from main            → "latest" (the dbt v2 line; the site's default)
-#       releases from DBT_V1_BRANCH   → "v1" (the dbt v1 line)
+#   - release published    → an "X.Y" version from the tag, aliased "latest" (the site's default)
 # Only runs once the repo is public, so nothing is published before the public release.
 on:
   push:
@@ -28,9 +26,6 @@ permissions:
 concurrency:
   group: docs-publish
   cancel-in-progress: false
-
-env:
-  DBT_V1_BRANCH: main-v1
 
 jobs:
   publish:
@@ -66,13 +61,8 @@ jobs:
         if: github.event_name == 'release'
         env:
           TAG: ${{ github.event.release.tag_name }}
-          TARGET: ${{ github.event.release.target_commitish }}
         run: |
           VERSION="${TAG#v}"
           MAJOR_MINOR="$(echo "$VERSION" | cut -d. -f1-2)"
-          if [ "$TARGET" = "$DBT_V1_BRANCH" ]; then
-            mike deploy --push --update-aliases --message "Deploy docs for release $TAG" "$MAJOR_MINOR" v1
-          else
-            mike deploy --push --update-aliases --message "Deploy docs for release $TAG" "$MAJOR_MINOR" latest
-            mike set-default --push latest
-          fi
+          mike deploy --push --update-aliases --message "Deploy docs for release $TAG" "$MAJOR_MINOR" latest
+          mike set-default --push latest

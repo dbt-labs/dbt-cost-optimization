@@ -17,7 +17,7 @@
   )
 }}
 
-{% set is_enterprise = var('snowflake_enterprise_edition', true) %}
+{% set is_enterprise = cost_optimization_setting('snowflake_enterprise_edition', true) %}
 {% set full_account = var('table_query_stats_full_account', false) %}
 {% set overlap_days = var('incremental_overlap_days', 31) %}
 

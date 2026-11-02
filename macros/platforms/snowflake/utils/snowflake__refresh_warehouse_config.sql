@@ -17,8 +17,10 @@
 
   {% if execute and target.type == 'snowflake' %}
 
-    {% set is_enterprise = var('snowflake_enterprise_edition', true) %}
-    {% set config_table = ref('int_snowflake__warehouse_config') %}
+    {% set is_enterprise = dbt_cost_optimization.cost_optimization_setting('snowflake_enterprise_edition', true) %}
+    {#- `this`, not ref() to this model: a post-hook's ref() to its own model is invisible to
+        dbt v1, and a depends_on hint for it is a cycle. The hook only runs on this model. -#}
+    {% set config_table = this %}
 
     {{ log("refresh_warehouse_config: running SHOW WAREHOUSES...", info=true) }}
 

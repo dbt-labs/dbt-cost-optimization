@@ -26,7 +26,7 @@
 
 {% set lookback_days    = var('warehouse_sizing_lookback_days', 30) %}
 {% set min_query_count  = var('warehouse_sizing_min_query_count', 20) %}
-{% set is_enterprise    = var('snowflake_enterprise_edition', true) %}
+{% set is_enterprise    = cost_optimization_setting('snowflake_enterprise_edition', true) %}
 
 with window_30d as (
     select

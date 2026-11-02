@@ -55,7 +55,7 @@ Remove anything sensitive (account identifiers, hostnames, table names) before p
 <packages.yml goes here>
 ```
 
-**Any package vars you've overridden** (in your `vars.yml` or with `--vars`):
+**Any package vars or environment variables you've set** (`dbt_project.yml` `vars:`, `vars.yml`, `--vars`, or `DBT_COST_OPTIMIZATION_*`):
 ```yaml
 <vars go here>
 ```

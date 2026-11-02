@@ -17,7 +17,7 @@
     Enterprise edition only: queries are attributed to tables through ACCESS_HISTORY.
   --#}
 
-  {% if execute and target.type == 'snowflake' and var('snowflake_enterprise_edition', true) %}
+  {% if execute and target.type == 'snowflake' and dbt_cost_optimization.cost_optimization_setting('snowflake_enterprise_edition', true) %}
 
     {% set evidence_table = ref('int_snowflake__query_spill_evidence') %}
     {% set query_history_table = ref('int_snowflake__query_history') %}

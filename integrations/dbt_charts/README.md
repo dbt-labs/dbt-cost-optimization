@@ -20,7 +20,7 @@ layers, so this board does not generalize to them as-is.
    package (`package:dbt_cost_optimization`):
 
    ```bash
-   dbt build --vars '{dbt_cost_optimization_enabled: true}' --select package:dbt_cost_optimization
+   DBT_COST_OPTIMIZATION_ENABLED=true dbt build --select package:dbt_cost_optimization
    ```
 
 3. Set your dbt profile name as an environment variable:

@@ -89,7 +89,7 @@ A large, read-heavy, fragmented table with Predictive Optimization disabled will
 
 ## Project Variables
 
-Set these in a `vars.yml` file in your project root (or with `--vars`) to customize behavior.
+Set these in your project's `dbt_project.yml` `vars:` section (or with `--vars`) to customize behavior.
 
 ### Query stats scope
 
@@ -113,7 +113,7 @@ Set these in a `vars.yml` file in your project root (or with `--vars`) to custom
 ### Example configuration
 
 ```yaml
-# vars.yml
+# dbt_project.yml
 vars:
   # Lower threshold for dev/sandbox environments
   liquid_clustering_candidates_min_size_gb: 0.1
